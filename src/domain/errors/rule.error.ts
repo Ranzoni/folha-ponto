@@ -6,4 +6,8 @@ export default class RuleError extends Error {
     static alreadyExists(): void {
         throw new RuleError('Already exists a rule with this name.')
     }
+
+    static notFound(): void {
+        throw new RuleError('Rule not found.')
+    }
 }

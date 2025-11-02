@@ -25,5 +25,10 @@ export abstract class BaseModel {
         return this._updatedAt
     }
 
+    protected registerUpdate(): void {
+        this._updatedAt = new Date()
+        this.validate()
+    }
+
     protected abstract validate(): void
 }

@@ -16,6 +16,11 @@ export default class Rule extends BaseModel {
     name(): string {
         return this._name
     }
+
+    update(name: string): void {
+        this._name = name
+        this.registerUpdate()
+    }
     
     protected validate(): void {
         const ruleName = this.name()

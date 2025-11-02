@@ -16,14 +16,52 @@ async function saveRule(rule: Rule): Promise<Rule | undefined> {
     return mapToRule(ruleCreated)
 }
 
-async function getRuleByName(name: string): Promise<Rule | undefined> {
+async function alterRule(rule: Rule): Promise<Rule | undefined> {
+    const data: any = {
+        name: rule.name()
+    }
+
+    if (rule.updatedAt())
+        data['updatedAt'] = rule.updatedAt()
+
+    const ruleAltered = await prisma.rule.update({
+        where: {
+            id: rule.id()
+        },
+        data: data
+    })
+    if (!ruleAltered)
+        return undefined
+
+    return mapToRule(ruleAltered)
+}
+
+async function getById(id: number): Promise<Rule | undefined> {
     const rule = await prisma.rule.findFirst({
         where: {
+            id: id
+        }
+    })
+    
+    if (!rule)
+        return undefined
+
+    return mapToRule(rule)
+}
+
+async function getRuleByName(name: string, idToIgnore?: number): Promise<Rule | undefined> {
+    const where: any = {
             name: {
                 equals: name,
                 mode: 'insensitive'
             }
         }
+
+    if (idToIgnore)
+        where['id'] = { not: idToIgnore }
+    
+    const rule = await prisma.rule.findFirst({
+        where: where
     })
     
     if (!rule)
@@ -40,4 +78,4 @@ function mapToRule(data: any): Rule {
     )
 }
 
-export { saveRule, getRuleByName }
+export { saveRule, alterRule, getById, getRuleByName }
