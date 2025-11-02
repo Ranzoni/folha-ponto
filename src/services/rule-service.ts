@@ -35,4 +35,12 @@ async function validateRuleRegister(name: string, idToIgnore?: number): Promise<
         RuleError.alreadyExists()
 }
 
-export { createRule, updateRule }
+async function searchRule(id: number): Promise<RuleResponse | undefined> {
+    const rule = await getById(id)
+    if (!rule)
+        return undefined
+
+    return mapToRuleResponse(rule)
+}
+
+export { createRule, updateRule, searchRule }

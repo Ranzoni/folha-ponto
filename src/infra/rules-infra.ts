@@ -74,7 +74,8 @@ function mapToRule(data: any): Rule {
     return new Rule(
         data.name,
         data.id,
-        data.createdAt
+        data.createdAt,
+        data.updatedAt
     )
 }
 
