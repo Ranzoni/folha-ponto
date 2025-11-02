@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express"
 import { mapToFailApiResponse, mapToSuccessApiResponse } from "./models/api.response.js"
-import { createRule, searchRule, updateRule } from "./services/rule-service.js"
+import { createRule, removeRule, searchRule, updateRule } from "./services/rule-service.js"
 
 const rulesRoutes = Router()
 
@@ -34,6 +34,23 @@ rulesRoutes.put('/:id', async (req: Request, res: Response) => {
     try {
         const ruleUpdated = await updateRule(+id, requestBody.name)
         return res.json(mapToSuccessApiResponse(ruleUpdated))
+    } catch (err) {
+        if (err instanceof Error)
+            return res.json(mapToFailApiResponse(err.message))
+        else 
+            return res.json(mapToFailApiResponse('Not mapped error found.'))
+    }
+})
+
+rulesRoutes.delete('/:id', async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    if (!id || !+id)
+        return res.json(mapToFailApiResponse('Request ID was not found.'))
+
+    try {
+        await removeRule(+id)
+        return res.json(mapToSuccessApiResponse('The rule was successfully removed.'))
     } catch (err) {
         if (err instanceof Error)
             return res.json(mapToFailApiResponse(err.message))

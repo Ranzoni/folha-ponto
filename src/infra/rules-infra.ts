@@ -36,6 +36,16 @@ async function alterRule(rule: Rule): Promise<Rule | undefined> {
     return mapToRule(ruleAltered)
 }
 
+async function deleteRule(id: number): Promise<boolean> {
+    const ruleDeleted = await prisma.rule.delete({
+        where: {
+            id: id
+        }
+    })
+
+    return !!ruleDeleted
+}
+
 async function getById(id: number): Promise<Rule | undefined> {
     const rule = await prisma.rule.findFirst({
         where: {
@@ -79,4 +89,4 @@ function mapToRule(data: any): Rule {
     )
 }
 
-export { saveRule, alterRule, getById, getRuleByName }
+export { saveRule, alterRule, deleteRule, getById, getRuleByName }

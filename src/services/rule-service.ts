@@ -1,6 +1,6 @@
 import RuleError from "../domain/errors/rule.error.js"
 import Rule from "../domain/models/rule.model.js"
-import { alterRule, getById, getRuleByName, saveRule } from "../infra/rules-infra.js"
+import { alterRule, deleteRule, getById, getRuleByName, saveRule } from "../infra/rules-infra.js"
 import mapToRuleResponse, { type RuleResponse } from "../models/rule.response.js"
 
 async function createRule(name: string): Promise<RuleResponse | undefined> {
@@ -35,6 +35,16 @@ async function validateRuleRegister(name: string, idToIgnore?: number): Promise<
         RuleError.alreadyExists()
 }
 
+async function removeRule(id: number): Promise<void> {
+    const rule = await getById(id)
+    if (!rule) 
+        RuleError.notFound()
+    
+    const removed = await deleteRule(rule!.id())
+    if (!removed)
+        throw new RuleError("Can't remove the rule.")
+}
+
 async function searchRule(id: number): Promise<RuleResponse | undefined> {
     const rule = await getById(id)
     if (!rule)
@@ -43,4 +53,4 @@ async function searchRule(id: number): Promise<RuleResponse | undefined> {
     return mapToRuleResponse(rule)
 }
 
-export { createRule, updateRule, searchRule }
+export { createRule, updateRule, removeRule, searchRule }
