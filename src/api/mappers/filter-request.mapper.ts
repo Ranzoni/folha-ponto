@@ -46,11 +46,11 @@ function mapToCondition(conditionString: string): FilterRequestItem | undefined 
     const match = conditionString.match(regex)
     
     if (!match)
-        return undefined
+        throw new Error('Invalid filter query.')
     
     const [, field, operator, rawValue] = match
     if (!match || !field || !operator)
-        return undefined
+        throw new Error('Invalid filter query.')
     
     let value: any = rawValue?.trim().replace(/^['"]|['"]$/g, '')
     

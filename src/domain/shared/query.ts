@@ -1,5 +1,7 @@
 import { ConditionOperator } from "../enums/condition-operator.enum.js"
 import type { OrderType } from "../enums/order-type.enum.js"
+import QueryError from "../errors/query.error.js"
+import { operationValueIsValidForType } from "../validators/query.validator.js"
 
 class Query {
     private _page: number
@@ -36,6 +38,9 @@ class Query {
             operator: operator,
             value: value
         }
+
+        if (!operationValueIsValidForType(condition))
+            QueryError.invalidValueType()
 
         this._queries[field] = condition as OperatorValue
     }

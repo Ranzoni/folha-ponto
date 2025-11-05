@@ -79,11 +79,11 @@ rulesRoutes.get('/:id', async (req: Request, res: Response) => {
 })
 
 rulesRoutes.get('/', async (req: Request, res: Response) => {
-    const filters = mapToFilterRequest(req.query)
-    if (!filters)
-        return res.json(handleFailResponse('Request parameters was not found.'))
-    
     try {
+        const filters = mapToFilterRequest(req.query)
+        if (!filters)
+            return res.json(handleFailResponse('Request parameters was not found.'))
+
         const rule = await searchRules(filters)
         return res.json(handleSuccessResponse(rule))
     } catch (err) {
