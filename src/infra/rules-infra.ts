@@ -1,5 +1,7 @@
 import Rule from "../domain/models/rule.model.js"
+import type { Query } from "../domain/shared/query.js"
 import { PrismaClient } from "../generated/prisma/client.js"
+import { mapToPrismaQuery } from "./mappers/query-builder.mapper.js"
 
 const prisma = new PrismaClient()
 
@@ -80,6 +82,14 @@ async function getRuleByName(name: string, idToIgnore?: number): Promise<Rule | 
     return mapToRule(rule)
 }
 
+async function getRules(query: Query): Promise<Rule[]> {
+    const rules = await prisma.rule.findMany(
+        mapToPrismaQuery(query)
+    )
+
+    return rules.map(rule => mapToRule(rule))
+}
+
 function mapToRule(data: any): Rule {
     return new Rule(
         data.name,
@@ -89,4 +99,4 @@ function mapToRule(data: any): Rule {
     )
 }
 
-export { saveRule, alterRule, deleteRule, getById, getRuleByName }
+export { saveRule, alterRule, deleteRule, getById, getRuleByName, getRules }

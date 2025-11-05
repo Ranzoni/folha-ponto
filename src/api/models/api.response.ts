@@ -3,7 +3,7 @@ export default interface ApiResponse<T> {
     resource: T
 }
 
-export function mapToSuccessApiResponse<T>(model: T): ApiResponse<T> | any {
+export function handleSuccessResponse<T>(model: T): ApiResponse<T> | any {
     const response: ApiResponse<T> = {
         success: true,
         resource: model
@@ -12,7 +12,7 @@ export function mapToSuccessApiResponse<T>(model: T): ApiResponse<T> | any {
     return response
 }
 
-export function mapToFailApiResponse(message: string): ApiResponse<string> | any {
+export function handleFailResponse(message: string): ApiResponse<string> | any {
     const response: ApiResponse<string> = {
         success: false,
         resource: message

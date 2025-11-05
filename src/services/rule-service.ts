@@ -1,7 +1,10 @@
 import RuleError from "../domain/errors/rule.error.js"
 import Rule from "../domain/models/rule.model.js"
-import { alterRule, deleteRule, getById, getRuleByName, saveRule } from "../infra/rules-infra.js"
-import mapToRuleResponse, { type RuleResponse } from "../models/rule.response.js"
+import { alterRule, deleteRule, getById, getRuleByName, getRules, saveRule } from "../infra/rules-infra.js"
+import type { RuleResponse } from "../api/models/rule.response.js"
+import { mapToQuery } from "./mappers/query.mapper.js"
+import mapToRuleResponse from "./mappers/rule.mapper.js"
+import type { FilterRequest } from "../api/models/filter.request.js"
 
 async function createRule(name: string): Promise<RuleResponse | undefined> {
     await validateRuleRegister(name)
@@ -53,4 +56,10 @@ async function searchRule(id: number): Promise<RuleResponse | undefined> {
     return mapToRuleResponse(rule)
 }
 
-export { createRule, updateRule, removeRule, searchRule }
+async function searchRules(filter: FilterRequest): Promise<RuleResponse[]> {
+    const query = mapToQuery(filter)
+    const rules = await getRules(query.query)
+    return rules.map(rule => mapToRuleResponse(rule))
+}
+
+export { createRule, updateRule, removeRule, searchRule, searchRules }
