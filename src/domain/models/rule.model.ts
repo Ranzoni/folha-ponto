@@ -13,7 +13,7 @@ export default class Rule extends BaseModel {
         this.validate()
     }
     
-    name(): string {
+    get name(): string {
         return this._name
     }
 
@@ -23,7 +23,7 @@ export default class Rule extends BaseModel {
     }
     
     protected validate(): void {
-        const ruleName = this.name()
+        const ruleName = this.name
 
         if (!ruleNameIsValid(ruleName))
             RuleError.invalidName()
