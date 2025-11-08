@@ -1,3 +1,4 @@
+import type { PrismaClient } from "@prisma/client"
 import type IRuleRepository from "../domain/models/interfaces/rules/rules-repository.interface.js"
 import Rule from "../domain/models/rule.model.js"
 import type { Query } from "../domain/shared/query.js"
@@ -5,9 +6,13 @@ import { mapToPrismaQuery } from "./mappers/query-builder.mapper.js"
 import BaseRepository from "./shared/base-repository.js"
 
 export default class RuleRepository extends BaseRepository<Rule> implements IRuleRepository {
+    constructor(client: PrismaClient) {
+        super(client)
+    }
+
     async save(entity: Rule): Promise<Rule | undefined> {
         return await this.executeSaveOrUpdate(entity, async (rule) => {
-            const ruleCreated = await this._prisma.rule.create({
+            const ruleCreated = await this._client.rule.create({
                 data: {
                     name: rule.name,
                     createdAt: rule.createdAt
@@ -29,7 +34,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
             if (rule.updatedAt)
                 data['updatedAt'] = rule.updatedAt
             
-            const ruleAltered = await this._prisma.rule.update({
+            const ruleAltered = await this._client.rule.update({
                 where: {
                     id: rule.id
                 },
@@ -44,7 +49,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
     
     async delete(entity: Rule): Promise<boolean> {
         return await this.executeDelete(entity, async (id) => {
-            const ruleDeleted = await this._prisma.rule.delete({
+            const ruleDeleted = await this._client.rule.delete({
                 where: {
                     id: id
                 }
@@ -65,7 +70,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
         if (idToIgnore)
             where['id'] = { not: idToIgnore }
         
-        const rule = await this._prisma.rule.findFirst({
+        const rule = await this._client.rule.findFirst({
             where: where
         })
         
@@ -76,7 +81,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
     }
 
     async get(id: number): Promise<Rule | undefined> {
-        const rule = await this._prisma.rule.findFirst({
+        const rule = await this._client.rule.findFirst({
             where: {
                 id: id
             }
@@ -89,7 +94,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
     }
 
     async getMany(query: Query): Promise<Rule[]> {
-        const rules = await this._prisma.rule.findMany(
+        const rules = await this._client.rule.findMany(
             mapToPrismaQuery(query)
         )
 

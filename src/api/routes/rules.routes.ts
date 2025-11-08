@@ -1,22 +1,22 @@
 import { Router, type Request, type Response } from "express"
 import { handleFailResponse, handleSuccessResponse } from "../models/api.response.js"
 import mapToFilterRequest from "../mappers/filter-request.mapper.js"
-import RuleService from "../../services/rule-service.js"
-import { getRepository } from "../api-injector.js"
-import type IRuleRepository from "../../domain/models/interfaces/rules/rules-repository.interface.js"
+import { getService, transaction } from "../api-injector.js"
+import type { RuleResponse } from "../models/rule.response.js"
 
 const ruleRoutes = Router()
-const ruleRepository = getRepository('rule') as IRuleRepository
-const ruleService = new RuleService(ruleRepository)
 
 ruleRoutes.post('/', async (req: Request, res: Response) => {
     const requestBody = req.body
-
+    
     if (!requestBody || !requestBody.name)
         return res.json(handleFailResponse('Request name was not found.'))
-
+    
     try {
-        const ruleCreated = await ruleService.createRule(requestBody.name)
+        const ruleCreated = await transaction<RuleResponse>(async () => {
+            return await getService('rule')
+                .createRule(requestBody.name)
+        })
         return res.json(handleSuccessResponse(ruleCreated))
     } catch (err) {
         if (err instanceof Error)
@@ -37,7 +37,10 @@ ruleRoutes.put('/:id', async (req: Request, res: Response) => {
         return res.json(handleFailResponse('Request name was not found.'))
 
     try {
-        const ruleUpdated = await ruleService.updateRule(+id, requestBody.name)
+        const ruleUpdated = await transaction<RuleResponse>(async () => {
+            return await getService('rule')
+                .updateRule(+id, requestBody.name)
+        })
         return res.json(handleSuccessResponse(ruleUpdated))
     } catch (err) {
         if (err instanceof Error)
@@ -54,7 +57,10 @@ ruleRoutes.delete('/:id', async (req: Request, res: Response) => {
         return res.json(handleFailResponse('Request ID was not found.'))
 
     try {
-        await ruleService.removeRule(+id)
+        await transaction<void>(async () => {
+            await getService('rule')
+                .removeRule(+id)
+        })
         return res.json(handleSuccessResponse('The rule was successfully removed.'))
     } catch (err) {
         if (err instanceof Error)
@@ -71,7 +77,10 @@ ruleRoutes.get('/:id', async (req: Request, res: Response) => {
         return res.json(handleFailResponse('Request ID was not found.'))
 
     try {
-        const rule = await ruleService.searchRule(+id)
+        const rule = await transaction<RuleResponse>(async () => {
+            return await getService('rule')
+                .searchRule(+id)
+        })
         return res.json(handleSuccessResponse(rule))
     } catch (err) {
         if (err instanceof Error)
@@ -87,8 +96,11 @@ ruleRoutes.get('/', async (req: Request, res: Response) => {
         if (!filters)
             return res.json(handleFailResponse('Request parameters was not found.'))
 
-        const rule = await ruleService.searchRules(filters)
-        return res.json(handleSuccessResponse(rule))
+        const rules = await transaction<RuleResponse[]>(async () => {
+            return await getService('rule')
+                .searchRules(filters)
+        }) ?? []
+        return res.json(handleSuccessResponse(rules))
     } catch (err) {
         if (err instanceof Error)
             return res.json(handleFailResponse(err.message))

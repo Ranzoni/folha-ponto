@@ -7,12 +7,15 @@ type SaveOrUpdateCallback<T extends BaseModel> = (entity: T) => Promise<T | unde
 type DeleteCallback = (id: number) => Promise<boolean>
 
 export default class BaseRepository<T extends BaseModel> {
-    protected _prisma = new PrismaClient()
+    protected _client = new PrismaClient()
+
+    constructor(client: PrismaClient) {
+        this._client = client
+    }
 
     async executeSaveOrUpdate(entity: T, callBack: SaveOrUpdateCallback<T>): Promise<T | undefined> {
-        const teste = entity.eventsOccurred.map(ev => this.mapToPrismaCreate(ev))
         const response = await callBack(entity)
-        await this._prisma.logEvent.createMany({
+        await this._client.logEvent.createMany({
             data: entity.eventsOccurred.map(ev => this.mapToPrismaCreate(ev))
         })
 
@@ -21,7 +24,7 @@ export default class BaseRepository<T extends BaseModel> {
 
     async executeDelete(entity: T, callBack: DeleteCallback): Promise<boolean> {
         const entityDeleted = await callBack(entity.id)
-        await this._prisma.logEvent.create({
+        await this._client.logEvent.create({
             data: this.mapToPrismaCreate(new LogEvent(entity, EventType.DELETE))
         })
 
