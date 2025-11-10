@@ -1,22 +1,15 @@
-import type { PrismaClient } from "@prisma/client"
 import type IRuleRepository from "../domain/models/interfaces/rules/rules-repository.interface.js"
 import Rule from "../domain/models/rule.model.js"
 import type { Query } from "../domain/shared/query.js"
-import { mapToPrismaQuery } from "./mappers/query-builder.mapper.js"
 import BaseRepository from "./shared/base-repository.js"
+import { getMany, getOne, remove, save, update } from "./context-infra.js"
 
 export default class RuleRepository extends BaseRepository<Rule> implements IRuleRepository {
-    constructor(client: PrismaClient) {
-        super(client)
-    }
-
     async save(entity: Rule): Promise<Rule | undefined> {
         return await this.executeSaveOrUpdate(entity, async (rule) => {
-            const ruleCreated = await this._client.rule.create({
-                data: {
+            const ruleCreated = await save('rule', {
                     name: rule.name,
                     createdAt: rule.createdAt
-                },
             })
             if (!ruleCreated)
                 return undefined
@@ -34,12 +27,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
             if (rule.updatedAt)
                 data['updatedAt'] = rule.updatedAt
             
-            const ruleAltered = await this._client.rule.update({
-                where: {
-                    id: rule.id
-                },
-                data: data
-            })
+            const ruleAltered = await update('rule', rule.id, data)
             if (!ruleAltered)
                 return undefined
             
@@ -49,12 +37,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
     
     async delete(entity: Rule): Promise<boolean> {
         return await this.executeDelete(entity, async (id) => {
-            const ruleDeleted = await this._client.rule.delete({
-                where: {
-                    id: id
-                }
-            })
-            
+            const ruleDeleted = await remove('rule', id)
             return !!ruleDeleted
         })
     }
@@ -70,9 +53,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
         if (idToIgnore)
             where['id'] = { not: idToIgnore }
         
-        const rule = await this._client.rule.findFirst({
-            where: where
-        })
+        const rule = await getOne('rule', where)
         
         if (!rule)
             return undefined
@@ -81,10 +62,8 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
     }
 
     async get(id: number): Promise<Rule | undefined> {
-        const rule = await this._client.rule.findFirst({
-            where: {
-                id: id
-            }
+        const rule = await getOne('rule', {
+            id
         })
         
         if (!rule)
@@ -94,10 +73,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
     }
 
     async getMany(query: Query): Promise<Rule[]> {
-        const rules = await this._client.rule.findMany(
-            mapToPrismaQuery(query)
-        )
-
+        const rules = await getMany('rule', query)
         return rules.map(rule => this.mapToRule(rule))
     }
     

@@ -1,5 +1,5 @@
 import type IRuleRepository from "../domain/models/interfaces/rules/rules-repository.interface.js"
-import { getClient } from "../infra/context-infra.js"
+import { openTransaction, type TransactionCallBack } from "../infra/context-infra.js"
 import RuleRepository from "../infra/rules-infra.js"
 import RuleService from "../services/rule-service.js"
 import InjectorError from "./errors/injector.error.js"
@@ -31,36 +31,17 @@ function getService<T extends ServicesType>(type: ServicesType): ServiceMap[T] {
     return service
 }
 
-let transactionClient: any
-
 const repositoryMap = {
     'rule': RuleRepository
 } as const
 
 function getRepository<T extends ServicesType>(type: T): RepositoryMap[T] {
-    if (!transactionClient)
-        InjectorError.transactionNotFound()
-
     const RepoClass = repositoryMap[type]
-    return new RepoClass(transactionClient) as RepositoryMap[T]
+    return new RepoClass() as RepositoryMap[T]
 }
 
-type TransactionCallBack<T> = () => Promise<T>
-
 async function transaction<TResponse>(callBack: TransactionCallBack<TResponse | undefined>): Promise<TResponse | undefined> {
-    const client = getClient()
-    
-    return await client.$transaction(async (tx) => {
-        transactionClient = tx
-        try {
-            return await callBack()
-        } finally {
-            transactionClient = undefined
-        }
-    }, {
-        maxWait: 5000,
-        timeout: 30000,
-    })
+    return await openTransaction(callBack)
 }
 
 export { getService, getRepository, transaction }

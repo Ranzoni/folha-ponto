@@ -6,8 +6,4 @@ export default class InjectorError extends Error {
     static ruleRepoNotFound(): void {
         throw new InjectorError('Rule repository not found.')
     }
-
-    static transactionNotFound(): void {
-        throw new InjectorError('The transaction was not found.')
-    }
 }
