@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express"
-import { handleFailResponse, handleSuccessResponse } from "../models/api.response.js"
+import { handleFailResponse, handleSuccessResponse, handleThrowResponse } from "../models/api.response.js"
 import mapToFilterRequest from "../mappers/filter-request.mapper.js"
 import { getService, transaction } from "../api-injector.js"
 import type { RuleResponse } from "../models/rule.response.js"
@@ -10,19 +10,16 @@ ruleRoutes.post('/', async (req: Request, res: Response) => {
     const requestBody = req.body
     
     if (!requestBody || !requestBody.name)
-        return res.json(handleFailResponse('Request name was not found.'))
+        return res.status(400).json(handleFailResponse('Request name was not found.'))
     
     try {
         const ruleCreated = await transaction<RuleResponse>(async () => {
             return await getService('rule')
                 .createRule(requestBody.name)
         })
-        return res.json(handleSuccessResponse(ruleCreated))
+        return res.status(201).json(handleSuccessResponse(ruleCreated))
     } catch (err) {
-        if (err instanceof Error)
-            return res.json(handleFailResponse(err.message))
-        else 
-            return res.json(handleFailResponse('Not mapped error found.'))
+        return handleThrowResponse(err, res)
     }
 })
 
@@ -31,10 +28,10 @@ ruleRoutes.put('/:id', async (req: Request, res: Response) => {
     const requestBody = req.body
 
     if (!id || !+id)
-        return res.json(handleFailResponse('Request ID was not found.'))
+        return res.status(400).json(handleFailResponse('Request ID was not found.'))
 
     if (!requestBody || !requestBody.name)
-        return res.json(handleFailResponse('Request name was not found.'))
+        return res.status(400).json(handleFailResponse('Request name was not found.'))
 
     try {
         const ruleUpdated = await transaction<RuleResponse>(async () => {
@@ -43,10 +40,7 @@ ruleRoutes.put('/:id', async (req: Request, res: Response) => {
         })
         return res.json(handleSuccessResponse(ruleUpdated))
     } catch (err) {
-        if (err instanceof Error)
-            return res.json(handleFailResponse(err.message))
-        else 
-            return res.json(handleFailResponse('Not mapped error found.'))
+        return handleThrowResponse(err, res)
     }
 })
 
@@ -54,7 +48,7 @@ ruleRoutes.delete('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
-        return res.json(handleFailResponse('Request ID was not found.'))
+        return res.status(400).json(handleFailResponse('Request ID was not found.'))
 
     try {
         await transaction<void>(async () => {
@@ -63,10 +57,7 @@ ruleRoutes.delete('/:id', async (req: Request, res: Response) => {
         })
         return res.json(handleSuccessResponse('The rule was successfully removed.'))
     } catch (err) {
-        if (err instanceof Error)
-            return res.json(handleFailResponse(err.message))
-        else 
-            return res.json(handleFailResponse('Not mapped error found.'))
+        return handleThrowResponse(err, res)
     }
 })
 
@@ -74,7 +65,7 @@ ruleRoutes.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
-        return res.json(handleFailResponse('Request ID was not found.'))
+        return res.status(400).json(handleFailResponse('Request ID was not found.'))
 
     try {
         const rule = await transaction<RuleResponse>(async () => {
@@ -83,10 +74,7 @@ ruleRoutes.get('/:id', async (req: Request, res: Response) => {
         })
         return res.json(handleSuccessResponse(rule))
     } catch (err) {
-        if (err instanceof Error)
-            return res.json(handleFailResponse(err.message))
-        else 
-            return res.json(handleFailResponse('Not mapped error found.'))
+        return handleThrowResponse(err, res)
     }
 })
 
@@ -94,7 +82,7 @@ ruleRoutes.get('/', async (req: Request, res: Response) => {
     try {
         const filters = mapToFilterRequest(req.query)
         if (!filters)
-            return res.json(handleFailResponse('Request parameters was not found.'))
+            return res.status(400).json(handleFailResponse('Request parameters was not found.'))
 
         const rules = await transaction<RuleResponse[]>(async () => {
             return await getService('rule')
@@ -102,10 +90,7 @@ ruleRoutes.get('/', async (req: Request, res: Response) => {
         }) ?? []
         return res.json(handleSuccessResponse(rules))
     } catch (err) {
-        if (err instanceof Error)
-            return res.json(handleFailResponse(err.message))
-        else 
-            return res.json(handleFailResponse('Not mapped error found.'))
+        return handleThrowResponse(err, res)
     }
 })
 
