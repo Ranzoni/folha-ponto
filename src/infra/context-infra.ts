@@ -5,7 +5,7 @@ import { mapToPrismaQuery } from "./mappers/query-builder.mapper.js"
 
 let transaction: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$extends'> | undefined
 
-type EntitiesType = 'rule' | 'logEvent'
+type EntitiesType = 'rule' | 'logEvent' | 'department'
 
 type TransactionCallBack<T> = () => Promise<T>
 
@@ -51,7 +51,11 @@ async function save<T extends EntitiesType>(entityType: T, data: any): Promise<a
                 data
             })
         case 'logEvent':
-            return await transaction!.logEvent.createMany({
+            return await transaction!.logEvent.create({
+                data
+            })
+        case 'department':
+            return await transaction!.department.create({
                 data
             })
         default:
@@ -66,6 +70,13 @@ async function update<T extends EntitiesType>(entityType: T, id: number, data: a
     switch (entityType) {
         case 'rule':
             return await transaction!.rule.update({
+                where: {
+                    id
+                },
+                data: data
+            })
+        case 'department':
+            return await transaction!.department.update({
                 where: {
                     id
                 },
@@ -87,6 +98,12 @@ async function remove<T extends EntitiesType>(entityType: T, id: number): Promis
                     id: id
                 }
             })
+        case 'department':
+            return await transaction!.department.delete({
+                where: {
+                    id: id
+                }
+            })
         default:
             ContextError.operationNotAllowed()
     }
@@ -99,6 +116,10 @@ async function getOne<T extends EntitiesType>(entityType: T, where: any): Promis
     switch (entityType) {
         case 'rule':
             return await transaction!.rule.findFirst({
+                where: where
+            })
+        case 'department':
+            return await transaction!.department.findFirst({
                 where: where
             })
         default:
@@ -115,6 +136,8 @@ async function getMany<T extends EntitiesType>(entityType: T, query: Query): Pro
     switch (entityType) {
         case 'rule':
             return await transaction!.rule.findMany(prismaQuery)
+        case 'department':
+            return await transaction!.department.findMany(prismaQuery)
         default:
             ContextError.operationNotAllowed()
     }

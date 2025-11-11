@@ -4,7 +4,7 @@ import type { RuleResponse } from "../api/models/rule.response.js"
 import { mapToQuery } from "./mappers/query.mapper.js"
 import mapToRuleResponse from "./mappers/rule.mapper.js"
 import type { FilterRequest } from "../api/models/filter.request.js"
-import type IRuleRepository from "../domain/models/interfaces/rules/rules-repository.interface.js"
+import type IRuleRepository from "../domain/models/interfaces/rules-repository.interface.js"
 
 export default class RuleService {
     private _ruleRepository: IRuleRepository

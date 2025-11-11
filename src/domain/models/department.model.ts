@@ -13,6 +13,10 @@ export default class Department extends BaseModel {
         this.validate()
     }
 
+    get name(): string {
+        return this._name
+    }
+
     protected validate(): void {
         if (departmentNameIsValid(this._name))
             DepartmentError.invalidName()

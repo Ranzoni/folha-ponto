@@ -1,4 +1,4 @@
-import type IRuleRepository from "../domain/models/interfaces/rules/rules-repository.interface.js"
+import type IRuleRepository from "../domain/models/interfaces/rules-repository.interface.js"
 import Rule from "../domain/models/rule.model.js"
 import type { Query } from "../domain/shared/query.js"
 import BaseRepository from "./shared/base-repository.js"
@@ -14,7 +14,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
             if (!ruleCreated)
                 return undefined
             
-            return this.mapToRule(ruleCreated)
+            return this.mapToEntity(ruleCreated)
         })
     }
     
@@ -31,7 +31,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
             if (!ruleAltered)
                 return undefined
             
-            return this.mapToRule(ruleAltered)
+            return this.mapToEntity(ruleAltered)
         })
     }
     
@@ -58,7 +58,7 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
         if (!rule)
             return undefined
 
-        return this.mapToRule(rule)
+        return this.mapToEntity(rule)
     }
 
     async get(id: number): Promise<Rule | undefined> {
@@ -69,15 +69,15 @@ export default class RuleRepository extends BaseRepository<Rule> implements IRul
         if (!rule)
             return undefined
 
-        return this.mapToRule(rule)
+        return this.mapToEntity(rule)
     }
 
     async getMany(query: Query): Promise<Rule[]> {
         const rules = await getMany('rule', query)
-        return rules.map(rule => this.mapToRule(rule))
+        return rules.map(rule => this.mapToEntity(rule))
     }
     
-    private mapToRule(data: any): Rule {
+    protected mapToEntity(data: any): Rule {
         return new Rule(
             data.name,
             data.id,

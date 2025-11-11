@@ -1,4 +1,4 @@
-import type IRuleRepository from "../domain/models/interfaces/rules/rules-repository.interface.js"
+import type IRuleRepository from "../domain/models/interfaces/rules-repository.interface.js"
 import { openTransaction, type TransactionCallBack } from "../infra/context-infra.js"
 import RuleRepository from "../infra/rules-infra.js"
 import RuleService from "../services/rule-service.js"

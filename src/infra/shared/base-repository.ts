@@ -7,7 +7,7 @@ import ContextError from "../errors/context.error.js"
 type SaveOrUpdateCallback<T extends BaseModel> = (entity: T) => Promise<T | undefined>
 type DeleteCallback = (id: number) => Promise<boolean>
 
-export default class BaseRepository<T extends BaseModel> {
+export default abstract class BaseRepository<T extends BaseModel> {
     async executeSaveOrUpdate(entity: T, callBack: SaveOrUpdateCallback<T>): Promise<T | undefined> {
         const response = await callBack(entity)
         if (!response)
@@ -25,6 +25,8 @@ export default class BaseRepository<T extends BaseModel> {
         await save('logEvent', this.mapLogEventToAny(new LogEvent(entity, EventType.DELETE)))
         return entityDeleted
     }
+
+    protected abstract mapToEntity(data: any): T
 
     private mapLogEventToAny(logEvent: LogEvent): any {
         return {
