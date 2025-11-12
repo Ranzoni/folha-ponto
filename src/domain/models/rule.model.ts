@@ -23,9 +23,7 @@ export default class Rule extends BaseModel {
     }
     
     protected validate(): void {
-        const ruleName = this.name
-
-        if (!ruleNameIsValid(ruleName))
+        if (!ruleNameIsValid(this.name))
             RuleError.invalidName()
     }
 }

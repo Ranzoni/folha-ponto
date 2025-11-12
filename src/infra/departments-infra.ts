@@ -5,6 +5,21 @@ import { getMany, getOne, remove, save, update } from "./context-infra.js"
 import BaseRepository from "./shared/base-repository.js"
 
 export default class DepartmentRepository extends BaseRepository<Department> implements IDepartmentRepository {
+    async getByName(name: string, idToIgnore?: number): Promise<Department | undefined> {
+        const where: any = {
+            name
+        }
+
+        if (idToIgnore)
+            where['id'] = idToIgnore
+
+        const department = await getOne('department', where)
+        if (!department)
+            return undefined
+
+        return this.mapToEntity(department)
+    }
+
     async save(entity: Department): Promise<Department | undefined> {
         return await this.executeSaveOrUpdate(entity, async (department) => {
             const departmentCreated = await save('department', {
