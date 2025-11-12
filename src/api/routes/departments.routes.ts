@@ -1,30 +1,30 @@
 import { Router, type Request, type Response } from "express"
 import { handleFailResponse, handleSuccessResponse, handleThrowResponse } from "../models/api.response.js"
-import mapToFilterRequest from "../mappers/filter-request.mapper.js"
+import type DepartmentResponse from "../models/department.response.js"
 import { getService, transaction } from "../api-injector.js"
-import type { RuleResponse } from "../models/rule.response.js"
-import type RuleService from "../../services/rule-service.js"
+import type DepartmentService from "../../services/department-service.js"
+import mapToFilterRequest from "../mappers/filter-request.mapper.js"
 
-const ruleRoutes = Router()
+const departmentsRoutes = Router()
 
-ruleRoutes.post('/', async (req: Request, res: Response) => {
+departmentsRoutes.post('/', async (req: Request, res: Response) => {
     const requestBody = req.body
-    
+
     if (!requestBody || !requestBody.name)
         return res.status(400).json(handleFailResponse('Request name was not found.'))
-    
+
     try {
-        const ruleCreated = await transaction<RuleResponse>(async () => {
-            return await getRuleService()
-                .createRule(requestBody.name)
+        const departmentCreated = await transaction<DepartmentResponse>(async () => {
+            return await getDepartmentService()
+                .createDepartment(requestBody.name)
         })
-        return res.status(201).json(handleSuccessResponse(ruleCreated))
+        return res.status(201).json(handleSuccessResponse(departmentCreated))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
 })
 
-ruleRoutes.put('/:id', async (req: Request, res: Response) => {
+departmentsRoutes.put('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
     const requestBody = req.body
 
@@ -35,17 +35,17 @@ ruleRoutes.put('/:id', async (req: Request, res: Response) => {
         return res.status(400).json(handleFailResponse('Request name was not found.'))
 
     try {
-        const ruleUpdated = await transaction<RuleResponse>(async () => {
-            return await getRuleService()
-                .updateRule(+id, requestBody.name)
+        const departmentUpdated = await transaction<DepartmentResponse>(async () => {
+            return await getDepartmentService()
+                .updateDepartment(+id, requestBody.name)
         })
-        return res.json(handleSuccessResponse(ruleUpdated))
+        return res.json(handleSuccessResponse(departmentUpdated))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
 })
 
-ruleRoutes.delete('/:id', async (req: Request, res: Response) => {
+departmentsRoutes.delete('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
@@ -53,25 +53,25 @@ ruleRoutes.delete('/:id', async (req: Request, res: Response) => {
 
     try {
         await transaction<void>(async () => {
-            await getRuleService()
-                .removeRule(+id)
+            await getDepartmentService()
+                .removeDepartment(+id)
         })
-        return res.json(handleSuccessResponse('The rule was successfully removed.'))
+        return res.json(handleSuccessResponse('The department was successfully removed.'))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
 })
 
-ruleRoutes.get('/:id', async (req: Request, res: Response) => {
+departmentsRoutes.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
         return res.status(400).json(handleFailResponse('Request ID was not found.'))
 
     try {
-        const rule = await transaction<RuleResponse>(async () => {
-            return await getRuleService()
-                .searchRule(+id)
+        const rule = await transaction<DepartmentResponse>(async () => {
+            return await getDepartmentService()
+                .searchDepartment(+id)
         })
         return res.json(handleSuccessResponse(rule))
     } catch (err) {
@@ -79,15 +79,15 @@ ruleRoutes.get('/:id', async (req: Request, res: Response) => {
     }
 })
 
-ruleRoutes.get('/', async (req: Request, res: Response) => {
+departmentsRoutes.get('/', async (req: Request, res: Response) => {
     try {
         const filters = mapToFilterRequest(req.query)
         if (!filters)
             return res.status(400).json(handleFailResponse('Request parameters was not found.'))
 
-        const rules = await transaction<RuleResponse[]>(async () => {
-            return await getRuleService()
-                .searchRules(filters)
+        const rules = await transaction<DepartmentResponse[]>(async () => {
+            return await getDepartmentService()
+                .searchDepartments(filters)
         }) ?? []
         return res.json(handleSuccessResponse(rules))
     } catch (err) {
@@ -95,8 +95,8 @@ ruleRoutes.get('/', async (req: Request, res: Response) => {
     }
 })
 
-function getRuleService(): RuleService {
-    return getService('rule') as RuleService
+function getDepartmentService(): DepartmentService {
+    return getService('department') as DepartmentService
 }
 
-export default ruleRoutes
+export default departmentsRoutes
