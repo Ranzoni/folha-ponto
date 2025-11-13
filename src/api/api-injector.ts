@@ -1,25 +1,25 @@
 import { openTransaction, type TransactionCallBack } from "../infra/context-infra.js"
 import DepartmentRepository from "../infra/departments-infra.js"
-import RuleRepository from "../infra/rules-infra.js"
+import RuleRepository from "../infra/roles-infra.js"
 import DepartmentService from "../services/department-service.js"
-import RuleService from "../services/rule-service.js"
+import RoleService from "../services/role-service.js"
 import InjectorError from "./errors/injector.error.js"
 
-type ServicesType = 'rule' | 'department'
+type ServicesType = 'role' | 'department'
 
 type ServiceMap = {
-    'rule': RuleService
+    'role': RoleService
     'department': DepartmentService
 }
 
 function getService<T extends ServicesType>(type: ServicesType): ServiceMap[T] {
     switch (type) {
-        case 'rule':
-            const ruleRepo = getRepository('rule')
+        case 'role':
+            const ruleRepo = getRepository('role')
             if (!ruleRepo)
                 InjectorError.ruleRepoNotFound()
 
-            return new RuleService(ruleRepo) as ServiceMap[T]
+            return new RoleService(ruleRepo) as ServiceMap[T]
         case 'department':
             const departmentRepo = getRepository('department')
             if (!departmentRepo)
@@ -32,13 +32,13 @@ function getService<T extends ServicesType>(type: ServicesType): ServiceMap[T] {
 }
 
 type RepositoryMap = {
-    'rule': RuleRepository
+    'role': RuleRepository
     'department': DepartmentRepository
 }
 
 function getRepository<T extends ServicesType>(type: T): RepositoryMap[T] {
     switch (type) {
-        case 'rule':
+        case 'role':
             return new RuleRepository() as RepositoryMap[T]
         case 'department':
             return new DepartmentRepository() as RepositoryMap[T]

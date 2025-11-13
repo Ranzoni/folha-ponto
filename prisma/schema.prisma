@@ -15,20 +15,21 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
-model Rule {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(50)
-  createdAt DateTime  @default(now())               @db.Timestamp(6) @map("created_at")
-  updatedAt DateTime? @map("updated_at")
+model Role {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(50)
+  employees Employee[]
+  createdAt DateTime    @default(now()) @db.Timestamp(6)  @map("created_at")
+  updatedAt DateTime?   @map("updated_at")
 
-  @@map("rules")
+  @@map("roles")
 }
 
 model LogEvent {
   id            Int       @id @default(autoincrement())
   content       Json
-  eventType     Int       @db.SmallInt()            @map("event_type")
-  dateOccurred  DateTime  @default(now())           @db.Timestamp(6) @map("date_occurred")
+  eventType     Int       @db.SmallInt()  @map("event_type")
+  dateOccurred  DateTime  @default(now()) @db.Timestamp(6)  @map("date_occurred")
 
   @@map("log_events")
 }
@@ -36,8 +37,28 @@ model LogEvent {
 model Department {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(100)
-  createdAt DateTime  @default(now())               @db.Timestamp(6) @map("created_at")
+  employees Employee[]
+  createdAt DateTime  @default(now()) @db.Timestamp(6)  @map("created_at")
   updatedAt DateTime? @map("updated_at")
 
   @@map("departments")
+}
+
+model Employee {
+  id                Int         @id @default(autoincrement())
+  name              String      @db.VarChar(100)
+  firstPeriodStart  Int         @db.SmallInt                      @map("first_period_start")
+  firstPeriodEnd    Int         @db.SmallInt                      @map("first_period_end")
+  lunchPeriodStart  Int         @db.SmallInt                      @map("lunch_period_start")
+  lunchPeriodEnd    Int         @db.SmallInt                      @map("lunch_period_end")
+  secondPeriodStart Int         @db.SmallInt                      @map("second_period_start")
+  secondPeriodEnd   Int         @db.SmallInt                      @map("second_period_end")
+  departmentId      Int         
+  department        Department  @relation(fields: [departmentId], references: [id])
+  roleId            Int
+  role              Role        @relation(fields: [roleId], references: [id])
+  createdAt         DateTime    @default(now()) @db.Timestamp(6)  @map("created_at")
+  updatedAt         DateTime?                                     @map("updated_at")
+
+  @@map("employees")
 }

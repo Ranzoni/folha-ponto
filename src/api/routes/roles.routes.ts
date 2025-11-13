@@ -2,21 +2,21 @@ import { Router, type Request, type Response } from "express"
 import { handleFailResponse, handleSuccessResponse, handleThrowResponse } from "../models/api.response.js"
 import mapToFilterRequest from "../mappers/filter-request.mapper.js"
 import { getService, transaction } from "../api-injector.js"
-import type { RuleResponse } from "../models/rule.response.js"
-import type RuleService from "../../services/rule-service.js"
+import type { RoleResponse } from "../models/role.response.js"
+import type RoleService from "../../services/role-service.js"
 
-const ruleRoutes = Router()
+const roleRoutes = Router()
 
-ruleRoutes.post('/', async (req: Request, res: Response) => {
+roleRoutes.post('/', async (req: Request, res: Response) => {
     const requestBody = req.body
     
     if (!requestBody || !requestBody.name)
         return res.status(400).json(handleFailResponse('Request name was not found.'))
     
     try {
-        const ruleCreated = await transaction<RuleResponse>(async () => {
-            return await getRuleService()
-                .createRule(requestBody.name)
+        const ruleCreated = await transaction<RoleResponse>(async () => {
+            return await getRoleService()
+                .createRole(requestBody.name)
         })
         return res.status(201).json(handleSuccessResponse(ruleCreated))
     } catch (err) {
@@ -24,7 +24,7 @@ ruleRoutes.post('/', async (req: Request, res: Response) => {
     }
 })
 
-ruleRoutes.put('/:id', async (req: Request, res: Response) => {
+roleRoutes.put('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
     const requestBody = req.body
 
@@ -35,9 +35,9 @@ ruleRoutes.put('/:id', async (req: Request, res: Response) => {
         return res.status(400).json(handleFailResponse('Request name was not found.'))
 
     try {
-        const ruleUpdated = await transaction<RuleResponse>(async () => {
-            return await getRuleService()
-                .updateRule(+id, requestBody.name)
+        const ruleUpdated = await transaction<RoleResponse>(async () => {
+            return await getRoleService()
+                .updateRole(+id, requestBody.name)
         })
         return res.json(handleSuccessResponse(ruleUpdated))
     } catch (err) {
@@ -45,7 +45,7 @@ ruleRoutes.put('/:id', async (req: Request, res: Response) => {
     }
 })
 
-ruleRoutes.delete('/:id', async (req: Request, res: Response) => {
+roleRoutes.delete('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
@@ -53,8 +53,8 @@ ruleRoutes.delete('/:id', async (req: Request, res: Response) => {
 
     try {
         await transaction<void>(async () => {
-            await getRuleService()
-                .removeRule(+id)
+            await getRoleService()
+                .removeRole(+id)
         })
         return res.json(handleSuccessResponse('The rule was successfully removed.'))
     } catch (err) {
@@ -62,16 +62,16 @@ ruleRoutes.delete('/:id', async (req: Request, res: Response) => {
     }
 })
 
-ruleRoutes.get('/:id', async (req: Request, res: Response) => {
+roleRoutes.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
         return res.status(400).json(handleFailResponse('Request ID was not found.'))
 
     try {
-        const rule = await transaction<RuleResponse>(async () => {
-            return await getRuleService()
-                .searchRule(+id)
+        const rule = await transaction<RoleResponse>(async () => {
+            return await getRoleService()
+                .searchRole(+id)
         })
         return res.json(handleSuccessResponse(rule))
     } catch (err) {
@@ -79,15 +79,15 @@ ruleRoutes.get('/:id', async (req: Request, res: Response) => {
     }
 })
 
-ruleRoutes.get('/', async (req: Request, res: Response) => {
+roleRoutes.get('/', async (req: Request, res: Response) => {
     try {
         const filters = mapToFilterRequest(req.query)
         if (!filters)
             return res.status(400).json(handleFailResponse('Request parameters was not found.'))
 
-        const rules = await transaction<RuleResponse[]>(async () => {
-            return await getRuleService()
-                .searchRules(filters)
+        const rules = await transaction<RoleResponse[]>(async () => {
+            return await getRoleService()
+                .searchRoles(filters)
         }) ?? []
         return res.json(handleSuccessResponse(rules))
     } catch (err) {
@@ -95,8 +95,8 @@ ruleRoutes.get('/', async (req: Request, res: Response) => {
     }
 })
 
-function getRuleService(): RuleService {
-    return getService('rule') as RuleService
+function getRoleService(): RoleService {
+    return getService('role') as RoleService
 }
 
-export default ruleRoutes
+export default roleRoutes

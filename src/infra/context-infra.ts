@@ -5,7 +5,7 @@ import { mapToPrismaQuery } from "./mappers/query-builder.mapper.js"
 
 let transaction: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$extends'> | undefined
 
-type EntitiesType = 'rule' | 'logEvent' | 'department'
+type EntitiesType = 'role' | 'logEvent' | 'department'
 
 type TransactionCallBack<T> = () => Promise<T>
 
@@ -46,8 +46,8 @@ async function save<T extends EntitiesType>(entityType: T, data: any): Promise<a
         ContextError.transactionNotFound()
 
     switch (entityType) {
-        case 'rule':
-            return await transaction!.rule.create({
+        case 'role':
+            return await transaction!.role.create({
                 data
             })
         case 'logEvent':
@@ -68,8 +68,8 @@ async function update<T extends EntitiesType>(entityType: T, id: number, data: a
         ContextError.transactionNotFound()
 
     switch (entityType) {
-        case 'rule':
-            return await transaction!.rule.update({
+        case 'role':
+            return await transaction!.role.update({
                 where: {
                     id
                 },
@@ -92,8 +92,8 @@ async function remove<T extends EntitiesType>(entityType: T, id: number): Promis
         ContextError.transactionNotFound()
 
     switch (entityType) {
-        case 'rule':
-            return await transaction!.rule.delete({
+        case 'role':
+            return await transaction!.role.delete({
                 where: {
                     id: id
                 }
@@ -114,8 +114,8 @@ async function getOne<T extends EntitiesType>(entityType: T, where: any): Promis
         ContextError.transactionNotFound()
 
     switch (entityType) {
-        case 'rule':
-            return await transaction!.rule.findFirst({
+        case 'role':
+            return await transaction!.role.findFirst({
                 where: where
             })
         case 'department':
@@ -134,8 +134,8 @@ async function getMany<T extends EntitiesType>(entityType: T, query: Query): Pro
     const prismaQuery = mapToPrismaQuery(query)
 
     switch (entityType) {
-        case 'rule':
-            return await transaction!.rule.findMany(prismaQuery)
+        case 'role':
+            return await transaction!.role.findMany(prismaQuery)
         case 'department':
             return await transaction!.department.findMany(prismaQuery)
         default:

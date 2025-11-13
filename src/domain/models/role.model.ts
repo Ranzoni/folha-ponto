@@ -1,8 +1,8 @@
-import RuleError from "../errors/rule.error.js"
-import { ruleNameIsValid } from "../validators/rule.validator.js"
+import RoleError from "../errors/role.error.js"
+import { roleNameIsValid } from "../validators/role.validator.js"
 import { BaseModel } from "./base.model.js"
 
-export default class Rule extends BaseModel {
+export default class Role extends BaseModel {
     private _name: string
     
     constructor(name: string, id?: number, createdAt?: Date, updatedAt?: Date) {
@@ -23,7 +23,7 @@ export default class Rule extends BaseModel {
     }
     
     protected validate(): void {
-        if (!ruleNameIsValid(this.name))
-            RuleError.invalidName()
+        if (!roleNameIsValid(this.name))
+            RoleError.invalidName()
     }
 }

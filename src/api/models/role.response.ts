@@ -1,5 +1,5 @@
 import type BaseResponse from "./base.response.js"
 
-export interface RuleResponse extends BaseResponse {
+export interface RoleResponse extends BaseResponse {
     name: string
 }
