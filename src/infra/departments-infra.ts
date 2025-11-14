@@ -1,7 +1,8 @@
 import Department from "../domain/models/department.model.js"
-import type IDepartmentRepository from "../domain/models/interfaces/departments-repository.interface.js"
+import type IDepartmentRepository from "../domain/repositories/departments-repository.interface.js"
 import type { Query } from "../domain/shared/query.js"
 import { getMany, getOne, remove, save, update } from "./context-infra.js"
+import mapAnyToDepartment from "./mappers/department.mapper.js"
 import BaseRepository from "./shared/base-repository.js"
 
 export default class DepartmentRepository extends BaseRepository<Department> implements IDepartmentRepository {
@@ -74,11 +75,6 @@ export default class DepartmentRepository extends BaseRepository<Department> imp
     }
 
     protected mapToEntity(data: any): Department {
-        return new Department(
-            data.name,
-            data.id,
-            data.createdAt,
-            data.updatedAt
-        )
+        return mapAnyToDepartment(data)
     }
 }

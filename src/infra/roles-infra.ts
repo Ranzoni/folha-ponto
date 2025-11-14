@@ -1,15 +1,16 @@
-import type IRoleRepository from "../domain/models/interfaces/roles-repository.interface.js"
+import type IRoleRepository from "../domain/repositories/roles-repository.interface.js"
 import Role from "../domain/models/role.model.js"
 import type { Query } from "../domain/shared/query.js"
 import BaseRepository from "./shared/base-repository.js"
 import { getMany, getOne, remove, save, update } from "./context-infra.js"
+import mapAnyToRole from "./mappers/role.mapper.js"
 
-export default class RuleRepository extends BaseRepository<Role> implements IRoleRepository {
+export default class RoleRepository extends BaseRepository<Role> implements IRoleRepository {
     async save(entity: Role): Promise<Role | undefined> {
-        return await this.executeSaveOrUpdate(entity, async (rule) => {
+        return await this.executeSaveOrUpdate(entity, async (role) => {
             const roleCreated = await save('role', {
-                    name: rule.name,
-                    createdAt: rule.createdAt
+                    name: role.name,
+                    createdAt: role.createdAt
             })
             if (!roleCreated)
                 return undefined
@@ -62,14 +63,14 @@ export default class RuleRepository extends BaseRepository<Role> implements IRol
     }
 
     async get(id: number): Promise<Role | undefined> {
-        const rule = await getOne('role', {
+        const role = await getOne('role', {
             id
         })
         
-        if (!rule)
+        if (!role)
             return undefined
 
-        return this.mapToEntity(rule)
+        return this.mapToEntity(role)
     }
 
     async getMany(query: Query): Promise<Role[]> {
@@ -78,11 +79,6 @@ export default class RuleRepository extends BaseRepository<Role> implements IRol
     }
     
     protected mapToEntity(data: any): Role {
-        return new Role(
-            data.name,
-            data.id,
-            data.createdAt,
-            data.updatedAt
-        )
+        return mapAnyToRole(data)
     }
 }

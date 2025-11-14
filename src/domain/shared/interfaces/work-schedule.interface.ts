@@ -1,5 +1,3 @@
-import type { WorkScheduleItem } from "../work-schedule.model.js"
-
 interface IWorkSchedule {
     get firstPeriod(): IWorkScheduleItem
     get lunch(): IWorkScheduleItem | undefined
@@ -9,6 +7,8 @@ interface IWorkSchedule {
 interface IWorkScheduleItem {
     get start(): number
     get end(): number
+
+    isEqual(workScheduleItem?: IWorkScheduleItem): boolean
 }
 
 export type { IWorkSchedule, IWorkScheduleItem }

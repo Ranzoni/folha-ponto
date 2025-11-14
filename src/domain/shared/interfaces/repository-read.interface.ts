@@ -1,4 +1,4 @@
-import type { Query } from "../../shared/query.js"
+import type { Query } from "../query.js"
 
 export default interface IRepositoryRead<T> {
     get(id: number): Promise<T | undefined>

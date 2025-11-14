@@ -80,20 +80,27 @@ class WorkScheduleItem implements IWorkScheduleItem {
 
         this.validate()
     }
-
+    
     get start(): number {
         return this._start
     }
-
+    
     get end(): number {
         return this._end
     }
-
+    
     update(start: number, end: number): void {
         this._start = start
         this._end = end
         
         this.validate()
+    }
+    
+    isEqual(workScheduleItem?: IWorkScheduleItem): boolean {
+        if (!workScheduleItem)
+            return false
+        
+        return this._start == workScheduleItem.start && this._end == workScheduleItem.end
     }
 
     private validate(): void {

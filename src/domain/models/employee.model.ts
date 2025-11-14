@@ -11,6 +11,7 @@ export default class Employee extends BaseModel {
     private _workSchedule: WorkSchedule
     private _department: Department
     private _role: Role
+    private _active: boolean
 
     constructor(
         name: string,
@@ -27,6 +28,7 @@ export default class Employee extends BaseModel {
         this._workSchedule = workSchedule
         this._department = department
         this._role = role
+        this._active = true
 
         this.validate()
     }
@@ -43,8 +45,12 @@ export default class Employee extends BaseModel {
         return this._department
     }
 
-    get rule(): Role {
+    get role(): Role {
         return this._role
+    }
+
+    get active(): boolean {
+        return this._active
     }
 
     updateName(name: string): void {
@@ -52,24 +58,29 @@ export default class Employee extends BaseModel {
         this.registerUpdate()
     }
 
-    addFirstPeriod(start: number, end: number): void {
-        this.addPeriod(start, end, this._workSchedule.updateFirstPeriod)
+    addFirstPeriod(firstPeriod: WorkScheduleItem): void {
+        this._workSchedule.updateFirstPeriod(firstPeriod)
+        this.registerUpdate()
     }
 
-    addLunch(start: number, end: number): void {
-        this.addPeriod(start, end, this._workSchedule.updateLunch)
+    addLunch(lunch: WorkScheduleItem): void {
+        this._workSchedule.updateLunch(lunch)
+        this.registerUpdate()
     }
 
     removeLunch(): void {
-        this.removePeriod(this._workSchedule.removeLunch)
+        this._workSchedule.removeLunch()
+        this.registerUpdate()
     }
 
-    addSecondPeriod(start: number, end: number): void {
-        this.addPeriod(start, end, this._workSchedule.updateSecondPeriod)
+    addSecondPeriod(secondPeriod: WorkScheduleItem): void {
+        this._workSchedule.updateSecondPeriod(secondPeriod)
+        this.registerUpdate()
     }
 
     removeSecondPeriod(): void {
-        this.removePeriod(this._workSchedule.removeSecondPeriod)
+        this._workSchedule.removeSecondPeriod()
+        this.registerUpdate()
     }
 
     updateDepartment(department: Department): void {
@@ -77,8 +88,13 @@ export default class Employee extends BaseModel {
         this.registerUpdate()
     }
 
-    updateRule(rule: Role): void {
-        this._role = rule
+    updateRole(role: Role): void {
+        this._role = role
+        this.registerUpdate()
+    }
+
+    activate(value: boolean): void {
+        this._active = value
         this.registerUpdate()
     }
 
@@ -92,18 +108,7 @@ export default class Employee extends BaseModel {
         if (!this._department)
             EmployeeError.departmentNotInformed()
 
-        if (!this.rule)
-            EmployeeError.ruleNotInformed()
-    }
-
-    private addPeriod(start: number, end: number, periodAction: (period: WorkScheduleItem) => void): void {
-        const period = new WorkScheduleItem(start, end)
-        periodAction(period)
-        this.registerUpdate()
-    }
-
-    private removePeriod(periodAction: () => void): void {
-        periodAction()
-        this.registerUpdate()
+        if (!this.role)
+            EmployeeError.roleNotInformed()
     }
 }

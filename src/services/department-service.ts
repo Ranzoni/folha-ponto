@@ -2,7 +2,7 @@ import type DepartmentResponse from "../api/models/department.response.js"
 import type { FilterRequest } from "../api/models/filter.request.js"
 import DepartmentError from "../domain/errors/department.error.js"
 import Department from "../domain/models/department.model.js"
-import type IDepartmentRepository from "../domain/models/interfaces/departments-repository.interface.js"
+import type IDepartmentRepository from "../domain/repositories/departments-repository.interface.js"
 import mapToDepartmentResponse from "./mappers/department.mapper.js"
 import { mapToQuery } from "./mappers/query.mapper.js"
 
@@ -46,7 +46,7 @@ export default class DepartmentService {
         
         const removed = await this._departmentRepository.delete(department!)
         if (!removed)
-            throw new DepartmentError("Can't remove the department.")
+            throw new DepartmentError("Cannot remove the department.")
     }
     
     async searchDepartment(id: number): Promise<DepartmentResponse | undefined> {

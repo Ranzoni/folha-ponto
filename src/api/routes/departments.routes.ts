@@ -5,9 +5,9 @@ import { getService, transaction } from "../api-injector.js"
 import type DepartmentService from "../../services/department-service.js"
 import mapToFilterRequest from "../mappers/filter-request.mapper.js"
 
-const departmentsRoutes = Router()
+const departmentRoutes = Router()
 
-departmentsRoutes.post('/', async (req: Request, res: Response) => {
+departmentRoutes.post('/', async (req: Request, res: Response) => {
     const requestBody = req.body
 
     if (!requestBody || !requestBody.name)
@@ -24,7 +24,7 @@ departmentsRoutes.post('/', async (req: Request, res: Response) => {
     }
 })
 
-departmentsRoutes.put('/:id', async (req: Request, res: Response) => {
+departmentRoutes.put('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
     const requestBody = req.body
 
@@ -45,7 +45,7 @@ departmentsRoutes.put('/:id', async (req: Request, res: Response) => {
     }
 })
 
-departmentsRoutes.delete('/:id', async (req: Request, res: Response) => {
+departmentRoutes.delete('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
@@ -62,34 +62,34 @@ departmentsRoutes.delete('/:id', async (req: Request, res: Response) => {
     }
 })
 
-departmentsRoutes.get('/:id', async (req: Request, res: Response) => {
+departmentRoutes.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
         return res.status(400).json(handleFailResponse('Request ID was not found.'))
 
     try {
-        const rule = await transaction<DepartmentResponse>(async () => {
+        const department = await transaction<DepartmentResponse>(async () => {
             return await getDepartmentService()
                 .searchDepartment(+id)
         })
-        return res.json(handleSuccessResponse(rule))
+        return res.json(handleSuccessResponse(department))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
 })
 
-departmentsRoutes.get('/', async (req: Request, res: Response) => {
+departmentRoutes.get('/', async (req: Request, res: Response) => {
     try {
         const filters = mapToFilterRequest(req.query)
         if (!filters)
             return res.status(400).json(handleFailResponse('Request parameters was not found.'))
 
-        const rules = await transaction<DepartmentResponse[]>(async () => {
+        const departments = await transaction<DepartmentResponse[]>(async () => {
             return await getDepartmentService()
                 .searchDepartments(filters)
         }) ?? []
-        return res.json(handleSuccessResponse(rules))
+        return res.json(handleSuccessResponse(departments))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
@@ -99,4 +99,4 @@ function getDepartmentService(): DepartmentService {
     return getService('department') as DepartmentService
 }
 
-export default departmentsRoutes
+export default departmentRoutes

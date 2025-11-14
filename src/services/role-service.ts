@@ -3,7 +3,7 @@ import Role from "../domain/models/role.model.js"
 import { mapToQuery } from "./mappers/query.mapper.js"
 import mapToRoleResponse from "./mappers/role.mapper.js"
 import type { FilterRequest } from "../api/models/filter.request.js"
-import type IRoleRepository from "../domain/models/interfaces/roles-repository.interface.js"
+import type IRoleRepository from "../domain/repositories/roles-repository.interface.js"
 import type { RoleResponse } from "../api/models/role.response.js"
 
 export default class RoleService {
@@ -46,7 +46,7 @@ export default class RoleService {
         
         const removed = await this._roleRepository.delete(role!)
         if (!removed)
-            throw new RoleError("Can't remove the role.")
+            throw new RoleError("Cannot remove the role.")
     }
     
     async searchRole(id: number): Promise<RoleResponse | undefined> {

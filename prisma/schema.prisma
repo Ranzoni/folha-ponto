@@ -49,10 +49,10 @@ model Employee {
   name              String      @db.VarChar(100)
   firstPeriodStart  Int         @db.SmallInt                      @map("first_period_start")
   firstPeriodEnd    Int         @db.SmallInt                      @map("first_period_end")
-  lunchPeriodStart  Int         @db.SmallInt                      @map("lunch_period_start")
-  lunchPeriodEnd    Int         @db.SmallInt                      @map("lunch_period_end")
-  secondPeriodStart Int         @db.SmallInt                      @map("second_period_start")
-  secondPeriodEnd   Int         @db.SmallInt                      @map("second_period_end")
+  lunchPeriodStart  Int?        @db.SmallInt                      @map("lunch_period_start")
+  lunchPeriodEnd    Int?        @db.SmallInt                      @map("lunch_period_end")
+  secondPeriodStart Int?        @db.SmallInt                      @map("second_period_start")
+  secondPeriodEnd   Int?        @db.SmallInt                      @map("second_period_end")
   departmentId      Int         
   department        Department  @relation(fields: [departmentId], references: [id])
   roleId            Int

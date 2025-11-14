@@ -13,8 +13,8 @@ export default class EmployeeError extends DomainError {
         throw new EmployeeError('The department must be informed.')
     }
 
-    static ruleNotInformed(): void {
-        throw new EmployeeError('The rule must be informed.')
+    static roleNotInformed(): void {
+        throw new EmployeeError('The role must be informed.')
     }
 
     static alreadyExists(): void {

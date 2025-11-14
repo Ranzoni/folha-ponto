@@ -14,11 +14,11 @@ roleRoutes.post('/', async (req: Request, res: Response) => {
         return res.status(400).json(handleFailResponse('Request name was not found.'))
     
     try {
-        const ruleCreated = await transaction<RoleResponse>(async () => {
+        const roleCreated = await transaction<RoleResponse>(async () => {
             return await getRoleService()
                 .createRole(requestBody.name)
         })
-        return res.status(201).json(handleSuccessResponse(ruleCreated))
+        return res.status(201).json(handleSuccessResponse(roleCreated))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
@@ -35,11 +35,11 @@ roleRoutes.put('/:id', async (req: Request, res: Response) => {
         return res.status(400).json(handleFailResponse('Request name was not found.'))
 
     try {
-        const ruleUpdated = await transaction<RoleResponse>(async () => {
+        const roleUpdated = await transaction<RoleResponse>(async () => {
             return await getRoleService()
                 .updateRole(+id, requestBody.name)
         })
-        return res.json(handleSuccessResponse(ruleUpdated))
+        return res.json(handleSuccessResponse(roleUpdated))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
@@ -56,7 +56,7 @@ roleRoutes.delete('/:id', async (req: Request, res: Response) => {
             await getRoleService()
                 .removeRole(+id)
         })
-        return res.json(handleSuccessResponse('The rule was successfully removed.'))
+        return res.json(handleSuccessResponse('The role was successfully removed.'))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
@@ -69,11 +69,11 @@ roleRoutes.get('/:id', async (req: Request, res: Response) => {
         return res.status(400).json(handleFailResponse('Request ID was not found.'))
 
     try {
-        const rule = await transaction<RoleResponse>(async () => {
+        const role = await transaction<RoleResponse>(async () => {
             return await getRoleService()
                 .searchRole(+id)
         })
-        return res.json(handleSuccessResponse(rule))
+        return res.json(handleSuccessResponse(role))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
@@ -85,11 +85,11 @@ roleRoutes.get('/', async (req: Request, res: Response) => {
         if (!filters)
             return res.status(400).json(handleFailResponse('Request parameters was not found.'))
 
-        const rules = await transaction<RoleResponse[]>(async () => {
+        const roles = await transaction<RoleResponse[]>(async () => {
             return await getRoleService()
                 .searchRoles(filters)
         }) ?? []
-        return res.json(handleSuccessResponse(rules))
+        return res.json(handleSuccessResponse(roles))
     } catch (err) {
         return handleThrowResponse(err, res)
     }

@@ -23,11 +23,18 @@ const NUMBER_OPERATIONS: ConditionOperator[] = [
     ConditionOperator.LESS_THAN_OR_EQUAL
 ]
 
+const BOOLEAN_OPERATIONS: ConditionOperator[] = [
+    ConditionOperator.EQUALS,
+    ConditionOperator.NOT_EQUALS
+]
+
 function operationValueIsValidForType(operatorValue: OperatorValue): boolean {
     if (operatorValue.value instanceof Date)
         return DATE_OPERATIONS.includes(operatorValue.operator)
     else if (!isNaN(Number(operatorValue.value)))
         return NUMBER_OPERATIONS.includes(operatorValue.operator)
+    else if (typeof operatorValue.value === 'boolean')
+        return BOOLEAN_OPERATIONS.includes(operatorValue.operator)
     else
         return STRING_OPERATIONS.includes(operatorValue.operator)
 }
