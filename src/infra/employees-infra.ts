@@ -111,7 +111,8 @@ export default class EmployeeRepository extends BaseRepository<Employee> impleme
             firstPeriodStart: employee.workSchedule.firstPeriod.start,
             firstPeriodEnd: employee.workSchedule.firstPeriod.end,
             departmentId: employee.department.id,
-            roleId: employee.role.id
+            roleId: employee.role.id,
+            active: employee.active
         }
 
         if (employee.workSchedule.lunch) {

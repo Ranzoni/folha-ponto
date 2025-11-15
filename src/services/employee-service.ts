@@ -32,7 +32,7 @@ export default class EmployeeService {
         const department = await this._departmentRepository.get(request.departmentId)
         const role = await this._roleRepository.get(request.roleId)
 
-        await this.validateEmployeeRegister(department, role)
+        this.validateEmployeeRegister(department, role)
 
         const workSchedule = mapToWorkSchedule(request.workSchedule)
 
@@ -48,7 +48,7 @@ export default class EmployeeService {
         const department = await this._departmentRepository.get(request.departmentId)
         const role = await this._roleRepository.get(request.roleId)
 
-        await this.validateEmployeeRegister(department, role)
+        this.validateEmployeeRegister(department, role)
 
         const employee = await this._employeeRepository.get(id)
         if (!employee)
@@ -107,14 +107,14 @@ export default class EmployeeService {
         return employees.map(employee => mapToEmployeeResponse(employee))
     }
 
-    private async validateEmployeeRegister(department: Department | undefined, role: Role | undefined): Promise<void> {
+    private validateEmployeeRegister(department: Department | undefined, role: Role | undefined): void {
         if (!department)
             DepartmentError.notFound()
 
         if (!role)
             RoleError.notFound()
     }
-
+    
     private updateWorkSchedule(workScheduleRequest: WorkScheduleRequestOrResponse, employee: Employee): void {
         const workSchedule = mapToWorkSchedule(workScheduleRequest)
 

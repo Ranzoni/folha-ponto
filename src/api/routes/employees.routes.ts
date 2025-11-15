@@ -1,17 +1,19 @@
 import { Router, type Request, type Response } from "express"
-import { handleFailResponse, handleSuccessResponse, handleThrowResponse } from "../models/api.response.js"
+import { handleFailResponse, handleSuccessResponse, handleThrowResponse, type ApiResponse } from "../models/api.response.js"
 import { getService, transaction } from "../api-injector.js"
 import type { EmployeeRequest, EmployeeResponse } from "../models/employee.response.js"
 import type EmployeeService from "../../services/employee-service.js"
 import mapToFilterRequest from "../mappers/filter-request.mapper.js"
+import { isNumberPrimitive } from "../../domain/shared/utils-functions.js"
 
 const employeeRoutes = Router()
 
 employeeRoutes.post('/', async (req: Request, res: Response) => {
     const requestBody = req.body
     
-    if (!requestBody)
-        return res.status(400).json(handleFailResponse('Request was not informed.'))
+    const validation = validateEmployeeRequestBody(requestBody)
+    if (validation)
+        return res.status(400).json(validation)
 
     try {
         const employeeCreated = await transaction<EmployeeResponse>(async () => {
@@ -30,8 +32,9 @@ employeeRoutes.put('/:id', async (req: Request, res: Response) => {
     if (!id || !+id)
         return res.status(400).json(handleFailResponse('Request ID was not found.'))
 
-    if (!requestBody)
-        return res.status(400).json(handleFailResponse('Request was not informed.'))
+    const validation = validateEmployeeRequestBody(requestBody)
+    if (validation)
+        return res.status(400).json(validation)
 
     try {
         const employeeUpdated = await transaction<EmployeeResponse>(async () => {
@@ -61,13 +64,9 @@ employeeRoutes.put('/:id/activate', async (req: Request, res: Response) => {
 
 employeeRoutes.put('/:id/deactivate', async (req: Request, res: Response) => {
     const { id } = req.params
-    const requestBody = req.body
     
     if (!id || !+id)
         return res.status(400).json(handleFailResponse('Request ID was not found.'))
-
-    if (!requestBody)
-        return res.status(400).json(handleFailResponse('Request was not informed.'))
 
     try {
         await transaction<void>(async () => {
@@ -128,6 +127,47 @@ employeeRoutes.get('/', async (req: Request, res: Response) => {
 
 function getEmployeeService(): EmployeeService {
     return getService('employee') as EmployeeService
+}
+
+function validateEmployeeRequestBody(requestBody: any): ApiResponse<string> | undefined {
+    if (!requestBody)
+        return handleFailResponse('Request was not informed.')
+
+    if (!requestBody.name)
+        return handleFailResponse('Request name was not found.')
+
+    if (!requestBody.workSchedule)
+        return handleFailResponse('Request work schedule was not found.')
+
+    if (!isNumberPrimitive(requestBody.workSchedule.firstPeriodStart))
+        return handleFailResponse('Request first period start was not found.')
+
+    if (!isNumberPrimitive(requestBody.workSchedule.firstPeriodEnd))
+        return handleFailResponse('Request first period end was not found.')
+
+    if (isNumberPrimitive(requestBody.workSchedule.lunchPeriodStart) || isNumberPrimitive(requestBody.workSchedule.lunchPeriodEnd)) {
+        if (!isNumberPrimitive(requestBody.workSchedule.lunchPeriodStart))
+            return handleFailResponse('Invalid request lunch period start.')
+
+        if (!isNumberPrimitive(requestBody.workSchedule.lunchPeriodEnd))
+            return handleFailResponse('Invalid request lunch period end.')
+    }
+
+    if (isNumberPrimitive(requestBody.workSchedule.secondPeriodStart) || isNumberPrimitive(requestBody.workSchedule.secondPeriodEnd)) {
+        if (!isNumberPrimitive(requestBody.workSchedule.secondPeriodStart))
+            return handleFailResponse('Invalid request second period start.')
+
+        if (!isNumberPrimitive(requestBody.workSchedule.secondPeriodEnd))
+            return handleFailResponse('Invalid request second period end.')
+    }
+
+    if (!requestBody.departmentId)
+        return handleFailResponse('Request department ID was not found.')
+
+    if (!requestBody.roleId)
+        return handleFailResponse('Request role ID was not found.')
+
+    return undefined
 }
 
 export default employeeRoutes

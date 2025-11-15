@@ -57,16 +57,48 @@ class WorkSchedule implements IWorkSchedule {
     private validateFirstPeriod(): void {
         if (!this._firstPeriod)
             WorkScheduleError.firstPeriodNotInformed()
+        
+        this.validateIntervals()
     }
     
     private validateLunchPeriod(): void {
         if (!this._lunch)
             WorkScheduleError.lunchNotInformed()
+        
+        this.validateIntervals()
     }
 
     private validateSecondPeriod(): void {
         if (!this._secondPeriod)
             WorkScheduleError.secondPeriodNotInformed()
+
+        this.validateIntervals()
+    }
+
+    private validateIntervals(): void {
+        if (this._lunch) {
+            if (this._firstPeriod.isConflictingWith(this._lunch))
+                WorkScheduleError.firstPeriodConflictWithLunch()
+
+            if (this._firstPeriod.isAfterThan(this._lunch))
+                WorkScheduleError.firstPeriodAfterLunch()
+
+            if (this._secondPeriod) {
+                if (this._secondPeriod.isConflictingWith(this._lunch))
+                    WorkScheduleError.lunchPeriodConflictWithSecondPeriod()
+
+                if (this._secondPeriod.isBeforeThan(this._lunch))
+                    WorkScheduleError.secondPeriodBeforeLunch()
+            }
+        }
+
+        if (this._secondPeriod) {
+            if (this._firstPeriod.isConflictingWith(this._secondPeriod))
+                WorkScheduleError.firstPeriodConflictWithSecondPeriod()
+
+            if (this._firstPeriod.isAfterThan(this._secondPeriod))
+                WorkScheduleError.firstPeriodAfterSecondPeriod()
+        }
     }
 }
 
@@ -80,7 +112,6 @@ class WorkScheduleItem implements IWorkScheduleItem {
 
         this.validate()
     }
-    
     get start(): number {
         return this._start
     }
@@ -102,10 +133,31 @@ class WorkScheduleItem implements IWorkScheduleItem {
         
         return this._start == workScheduleItem.start && this._end == workScheduleItem.end
     }
+    
+    isAfterThan(workScheduleItem: IWorkScheduleItem): boolean {
+        return this._start >= workScheduleItem.end
+    }
 
+    isBeforeThan(workScheduleItem: IWorkScheduleItem): boolean {
+        return this._end <= workScheduleItem.start
+    }
+
+    isConflictingWith(workScheduleItem: IWorkScheduleItem, stopRecursion: boolean = false): boolean {
+        const isConflicting = (workScheduleItem.start >= this._start && workScheduleItem.start < this._end)
+            || (workScheduleItem.end > this._start && workScheduleItem.end <= this._end)
+
+        if (stopRecursion || isConflicting)
+            return isConflicting
+
+        return workScheduleItem.isConflictingWith(this, true)
+    }
+    
     private validate(): void {
         if (!workScheduleHourIsValid(this._start))
             WorkScheduleError.invalidStartHour()
+
+        if (!workScheduleHourIsValid(this._end))
+            WorkScheduleError.invalidEndHour()
 
         if (!workScheduleIntervalIsValid(this._start, this._end))
             WorkScheduleError.invalidInterval()

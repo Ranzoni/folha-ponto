@@ -9,6 +9,9 @@ interface IWorkScheduleItem {
     get end(): number
 
     isEqual(workScheduleItem?: IWorkScheduleItem): boolean
+    isAfterThan(workScheduleItem: IWorkScheduleItem): boolean
+    isBeforeThan(workScheduleItem: IWorkScheduleItem): boolean
+    isConflictingWith(workScheduleItem: IWorkScheduleItem, stopRecursion: boolean): boolean
 }
 
 export type { IWorkSchedule, IWorkScheduleItem }
