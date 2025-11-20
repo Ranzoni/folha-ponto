@@ -39,7 +39,7 @@ export default class EmployeeService {
         const employee = new Employee(request.name, workSchedule, department!, role!)
         const employeeCreated = await this._employeeRepository.save(employee)
         if (!employeeCreated)
-            throw new EmployeeError('Fail to recover the employee created.')
+            throw new EmployeeError('Falha ao recuperar o funcionário criado.')
 
         return mapToEmployeeResponse(employeeCreated)
     }
@@ -67,7 +67,7 @@ export default class EmployeeService {
 
         const employeeUpdated = await this._employeeRepository.update(employee!)
         if (!employeeUpdated)
-            throw new EmployeeError('Fail to recover the employee updated.')
+            throw new EmployeeError('Falha ao recuperar o funcionário alterado.')
 
         return mapToEmployeeResponse(employeeUpdated!)
     }
@@ -79,7 +79,7 @@ export default class EmployeeService {
         
         const removed = await this._employeeRepository.delete(employee!)
         if (!removed)
-            throw new EmployeeError('Cannot remove the employee.')
+            throw new EmployeeError('Falha ao remover o funcionário.')
     }
 
     async activate(id: number, active: boolean): Promise<void> {
@@ -90,7 +90,7 @@ export default class EmployeeService {
         employee!.activate(active)
         const employeeUpdated = await this._employeeRepository.update(employee!)
         if (!employeeUpdated)
-            throw new EmployeeError('Cannot change the employee status.')
+            throw new EmployeeError('Falha ao alterar o estado do funcionário.')
     }
     
     async searchEmployee(id: number): Promise<EmployeeResponse | undefined> {

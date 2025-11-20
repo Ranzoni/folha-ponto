@@ -6,4 +6,5 @@ export enum ConditionOperator {
     LESS_THAN,
     LESS_THAN_OR_EQUAL,
     CONTAINS,
+    IN
 }

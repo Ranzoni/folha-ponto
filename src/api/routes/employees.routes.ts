@@ -30,7 +30,7 @@ employeeRoutes.put('/:id', async (req: Request, res: Response) => {
     const requestBody = req.body
     
     if (!id || !+id)
-        return res.status(400).json(handleFailResponse('Request ID was not found.'))
+        return res.status(400).json(handleFailResponse('O ID do funcionário não foi informado na requisição.'))
 
     const validation = validateEmployeeRequestBody(requestBody)
     if (validation)
@@ -82,13 +82,13 @@ employeeRoutes.delete('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
     
     if (!id || !+id)
-        return res.status(400).json(handleFailResponse('Request ID was not found.'))
+        return res.status(400).json(handleFailResponse('O ID do funcionário não foi informado na requisição.'))
 
     try {
         await transaction<void>(async () => {
             return await getEmployeeService().removeEmployee(+id)
         })
-        return res.json(handleSuccessResponse('The employee was successfully removed.'))
+        return res.json(handleSuccessResponse('O funcionário foi removido com sucesso.'))
     } catch (err) {
         return handleThrowResponse(err, res)
     }
@@ -98,7 +98,7 @@ employeeRoutes.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id || !+id)
-        return res.status(400).json(handleFailResponse('Request ID was not found.'))
+        return res.status(400).json(handleFailResponse('O ID do funcionário não foi informado na requisição.'))
 
     try {
         const employee = await transaction<EmployeeResponse>(async () => {
@@ -114,7 +114,7 @@ employeeRoutes.get('/', async (req: Request, res: Response) => {
     try {
         const filters = mapToFilterRequest(req.query)
         if (!filters)
-            return res.status(400).json(handleFailResponse('Request parameters was not found.'))
+            return res.status(400).json(handleFailResponse('Os parâmetros não foram informados na requisição.'))
 
         const employee = await transaction<EmployeeResponse[]>(async () => {
             return await getEmployeeService().searchEmployees(filters)
@@ -131,41 +131,41 @@ function getEmployeeService(): EmployeeService {
 
 function validateEmployeeRequestBody(requestBody: any): ApiResponse<string> | undefined {
     if (!requestBody)
-        return handleFailResponse('Request was not informed.')
+        return handleFailResponse('O corpo da requisição não foi informado.')
 
     if (!requestBody.name)
-        return handleFailResponse('Request name was not found.')
+        return handleFailResponse('O nome do funcionário não foi informado.')
 
     if (!requestBody.workSchedule)
-        return handleFailResponse('Request work schedule was not found.')
+        return handleFailResponse('A escala de trabalho do funcionário não foi informada.')
 
     if (!isNumberPrimitive(requestBody.workSchedule.firstPeriodStart))
-        return handleFailResponse('Request first period start was not found.')
+        return handleFailResponse('O início do primeiro período de trabalho não foi informado.')
 
     if (!isNumberPrimitive(requestBody.workSchedule.firstPeriodEnd))
-        return handleFailResponse('Request first period end was not found.')
+        return handleFailResponse('O fim do primeiro período de trabalho não foi informado.')
 
     if (isNumberPrimitive(requestBody.workSchedule.lunchPeriodStart) || isNumberPrimitive(requestBody.workSchedule.lunchPeriodEnd)) {
         if (!isNumberPrimitive(requestBody.workSchedule.lunchPeriodStart))
-            return handleFailResponse('Invalid request lunch period start.')
+            return handleFailResponse('O valor informado para o início do horário de almoço é inválido.')
 
         if (!isNumberPrimitive(requestBody.workSchedule.lunchPeriodEnd))
-            return handleFailResponse('Invalid request lunch period end.')
+            return handleFailResponse('O valor informado para o fim do horário de almoço é inválido.')
     }
 
     if (isNumberPrimitive(requestBody.workSchedule.secondPeriodStart) || isNumberPrimitive(requestBody.workSchedule.secondPeriodEnd)) {
         if (!isNumberPrimitive(requestBody.workSchedule.secondPeriodStart))
-            return handleFailResponse('Invalid request second period start.')
+            return handleFailResponse('O valor informado para o início do segundo período é inválido.')
 
         if (!isNumberPrimitive(requestBody.workSchedule.secondPeriodEnd))
-            return handleFailResponse('Invalid request second period end.')
+            return handleFailResponse('O valor informado para o fim do segundo período é inválido.')
     }
 
     if (!requestBody.departmentId)
-        return handleFailResponse('Request department ID was not found.')
+        return handleFailResponse('O departamento do funcionário não foi informado.')
 
     if (!requestBody.roleId)
-        return handleFailResponse('Request role ID was not found.')
+        return handleFailResponse('O cargo do funcionário não foi informado.')
 
     return undefined
 }

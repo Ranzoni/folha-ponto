@@ -20,12 +20,17 @@ const NUMBER_OPERATIONS: ConditionOperator[] = [
     ConditionOperator.GREATER_THAN,
     ConditionOperator.GREATER_THAN_OR_EQUAL,
     ConditionOperator.LESS_THAN,
-    ConditionOperator.LESS_THAN_OR_EQUAL
+    ConditionOperator.LESS_THAN_OR_EQUAL,
+    ConditionOperator.IN
 ]
 
 const BOOLEAN_OPERATIONS: ConditionOperator[] = [
     ConditionOperator.EQUALS,
     ConditionOperator.NOT_EQUALS
+]
+
+const ARRAY_OPERATIONS: ConditionOperator[] = [
+    ConditionOperator.IN
 ]
 
 function operationValueIsValidForType(operatorValue: OperatorValue): boolean {
@@ -35,6 +40,8 @@ function operationValueIsValidForType(operatorValue: OperatorValue): boolean {
         return NUMBER_OPERATIONS.includes(operatorValue.operator)
     else if (typeof operatorValue.value === 'boolean')
         return BOOLEAN_OPERATIONS.includes(operatorValue.operator)
+    else if (Array.isArray(operatorValue.value))
+        return ARRAY_OPERATIONS.includes(operatorValue.operator)
     else
         return STRING_OPERATIONS.includes(operatorValue.operator)
 }

@@ -19,7 +19,7 @@ export default class DepartmentService {
         const department = new Department(name)
         const departmentCreated = await this._departmentRepository.save(department)
         if (!departmentCreated)
-            throw new DepartmentError('Fail to recover the department created.')
+            throw new DepartmentError('Falha ao recuperar o departamento criado.')
 
         return mapToDepartmentResponse(departmentCreated)
     }
@@ -34,7 +34,7 @@ export default class DepartmentService {
         department!.update(name)
         const departmentUpdated = await this._departmentRepository.update(department!)
         if (!departmentUpdated)
-            throw new DepartmentError('Fail to recover the department updated.')
+            throw new DepartmentError('Falha ao recuperar o departamento alterado.')
 
         return mapToDepartmentResponse(departmentUpdated!)
     }
@@ -46,7 +46,7 @@ export default class DepartmentService {
         
         const removed = await this._departmentRepository.delete(department!)
         if (!removed)
-            throw new DepartmentError("Cannot remove the department.")
+            throw new DepartmentError("Falha ao remover o departamento.")
     }
     
     async searchDepartment(id: number): Promise<DepartmentResponse | undefined> {

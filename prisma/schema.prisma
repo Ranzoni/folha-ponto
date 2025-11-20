@@ -19,6 +19,8 @@ model Role {
   id        Int         @id @default(autoincrement())
   name      String      @db.VarChar(50)
   employees Employee[]
+  groupMembers  GroupMember[]
+  permissions   Permission[]
   createdAt DateTime    @default(now()) @db.Timestamp(6)  @map("created_at")
   updatedAt DateTime?   @map("updated_at")
 
@@ -35,11 +37,13 @@ model LogEvent {
 }
 
 model Department {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(100)
-  employees Employee[]
-  createdAt DateTime  @default(now()) @db.Timestamp(6)  @map("created_at")
-  updatedAt DateTime? @map("updated_at")
+  id            Int       @id @default(autoincrement())
+  name          String    @db.VarChar(100)
+  employees     Employee[]
+  groupMembers  GroupMember[]
+  permissions   Permission[]
+  createdAt     DateTime  @default(now()) @db.Timestamp(6)  @map("created_at")
+  updatedAt     DateTime? @map("updated_at")
 
   @@map("departments")
 }
@@ -54,12 +58,80 @@ model Employee {
   secondPeriodStart Int?        @db.SmallInt                      @map("second_period_start")
   secondPeriodEnd   Int?        @db.SmallInt                      @map("second_period_end")
   departmentId      Int         
-  department        Department  @relation(fields: [departmentId], references: [id])
+  department        Department  @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   roleId            Int
-  role              Role        @relation(fields: [roleId], references: [id])
+  role              Role        @relation(fields: [roleId], references: [id], onDelete: Restrict)
   active            Boolean     @default(true)
   createdAt         DateTime    @default(now()) @db.Timestamp(6)  @map("created_at")
   updatedAt         DateTime?                                     @map("updated_at")
 
   @@map("employees")
+}
+
+model Group {
+  id                Int           @id @default(autoincrement())
+  name              String        @db.VarChar(50)
+  groupMembers      GroupMember[]
+  permissions       Permission[]
+  createdAt         DateTime      @default(now()) @db.Timestamp(6)  @map("created_at")
+  updatedAt         DateTime?                                       @map("updated_at")
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id                Int           @id @default(autoincrement())
+  groupId           Int           @map("group_id")
+  group             Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  departmentId      Int?          @map("department_id")
+  department        Department?   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  roleId            Int?          @map("role_id")
+  role              Role?         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt         DateTime      @default(now()) @db.Timestamp(6)  @map("created_at")
+  updatedAt         DateTime?                                       @map("updated_at")
+
+  @@map("group_members")
+}
+
+model Permission {
+  id                Int               @id @default(autoincrement())
+  permissions       PermissionItem[]
+  groupId           Int?              @map("group_id")
+  group             Group?            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  departmentId      Int?              @map("department_id")
+  department        Department?       @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  roleId            Int?              @map("role_id")
+  role              Role?             @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt         DateTime          @default(now()) @db.Timestamp(6)  @map("created_at")
+  updatedAt         DateTime?                                           @map("updated_at")
+
+  @@map("permissions")
+}
+
+enum PermissionEntity {
+  EMPLOYEE
+  DEPARTMENT
+  ROLE
+  GROUP
+  PERMISSION
+  LOG_EVENT
+}
+
+enum PermissionType {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+}
+
+model PermissionItem {
+  id              Int               @id @default(autoincrement())
+  entity          PermissionEntity  @map("entity")
+  type            PermissionType    @map("type")
+  permissionId    Int               @map("permission_id")
+  permission      Permission        @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt       DateTime          @default(now()) @db.Timestamp(6)  @map("created_at")
+  updatedAt       DateTime?                                           @map("updated_at")
+
+  @@map("permission_items")
 }

@@ -5,7 +5,7 @@ import { mapToPrismaQuery } from "./mappers/query-builder.mapper.js"
 
 let transaction: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$extends'> | undefined
 
-type EntitiesType = 'role' | 'logEvent' | 'department' | 'employee'
+type EntitiesType = 'role' | 'logEvent' | 'department' | 'employee' | 'group' | 'permission'
 
 type TransactionCallBack<T> = () => Promise<T>
 
@@ -35,6 +35,10 @@ async function saveMany<T extends EntitiesType>(entityType: T, data: any): Promi
                 data
             })
             break
+        case 'permission':
+            await transaction!.permission.createMany({
+                data
+            })
         default:
             ContextError.operationNotAllowed()
             break
@@ -66,6 +70,19 @@ async function save<T extends EntitiesType>(entityType: T, data: any): Promise<a
                     role: true
                 }
             })
+        case 'group':
+            return await transaction!.group.create({
+                data,
+                include: {
+                    groupMembers: {
+                        include: {
+                            role: true,
+                            department: true,
+                            group: true
+                        }
+                    }
+                }
+            })
         default:
             ContextError.operationNotAllowed()
     }
@@ -81,24 +98,40 @@ async function update<T extends EntitiesType>(entityType: T, id: number, data: a
                 where: {
                     id
                 },
-                data: data
+                data
             })
         case 'department':
             return await transaction!.department.update({
                 where: {
                     id
                 },
-                data: data
+                data
             })
         case 'employee':
             return await transaction!.employee.update({
                 where: {
                     id
                 },
-                data: data,
+                data,
                 include: {
                     department: true,
                     role: true
+                }
+            })
+        case 'group':
+            return await transaction!.group.update({
+                where: {
+                    id
+                },
+                data,
+                include: {
+                    groupMembers: {
+                        include: {
+                            role: true,
+                            department: true,
+                            group: true
+                        }
+                    }
                 }
             })
         default:
@@ -129,6 +162,12 @@ async function remove<T extends EntitiesType>(entityType: T, id: number): Promis
                     id
                 }
             })
+        case 'group':
+            return await transaction!.group.delete({
+                where: {
+                    id
+                }
+            })
         default:
             ContextError.operationNotAllowed()
     }
@@ -155,6 +194,19 @@ async function getOne<T extends EntitiesType>(entityType: T, where: any): Promis
                     role: true
                 }
             })
+        case 'group':
+            return await transaction!.group.findFirst({
+                where,
+                include: {
+                    groupMembers: {
+                        include: {
+                            role: true,
+                            department: true,
+                            group: true
+                        }
+                    }
+                }
+            })
         default:
             ContextError.operationNotAllowed()
     }
@@ -177,6 +229,17 @@ async function getMany<T extends EntitiesType>(entityType: T, query: Query): Pro
                 role: true
             }
             return await transaction!.employee.findMany(prismaQuery)
+        case 'group':
+            prismaQuery['include'] = {
+                groupMembers: {
+                    include: {
+                        role: true,
+                        department: true,
+                        group: true
+                    }
+                }
+            }
+            return await transaction!.group.findMany(prismaQuery)
         default:
             ContextError.operationNotAllowed()
     }

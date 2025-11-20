@@ -14,4 +14,8 @@ export default class InjectorError extends Error {
     static employeeRepoNotFound(): void {
         throw new InjectorError('Employee repository not found.')
     }
+
+    static groupRepoNotFound(): void {
+        throw new InjectorError('Group repository not found.')
+    }
 }

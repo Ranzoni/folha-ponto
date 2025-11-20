@@ -52,6 +52,10 @@ export function mapToPrismaQuery(queryBuilder: Query): any {
                     mode: 'insensitive'
                 }
                 break
+            case ConditionOperator.IN:
+                condition = {
+                    in: op.value
+                }
         }
 
         where[key] = condition

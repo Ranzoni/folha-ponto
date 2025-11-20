@@ -19,7 +19,7 @@ export default class RoleService {
         const role = new Role(name)
         const roleCreated = await this._roleRepository.save(role)
         if (!roleCreated)
-            throw new RoleError('Fail to recover the role created.')
+            throw new RoleError('Falha ao recuperar o cargo criado.')
 
         return mapToRoleResponse(roleCreated)
     }
@@ -34,7 +34,7 @@ export default class RoleService {
         role!.update(name)
         const roleUpdated = await this._roleRepository.update(role!)
         if (!roleUpdated)
-            throw new RoleError('Fail to recover the role updated.')
+            throw new RoleError('Falha ao recuperar o cargo alterado.')
         
         return mapToRoleResponse(roleUpdated)
     }
@@ -46,7 +46,7 @@ export default class RoleService {
         
         const removed = await this._roleRepository.delete(role!)
         if (!removed)
-            throw new RoleError("Cannot remove the role.")
+            throw new RoleError("Falha ao remover o cargo.")
     }
     
     async searchRole(id: number): Promise<RoleResponse | undefined> {

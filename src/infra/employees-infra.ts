@@ -2,10 +2,8 @@ import { ConditionOperator } from "../domain/enums/condition-operator.enum.js"
 import Employee from "../domain/models/employee.model.js"
 import type IEmployeeRepository from "../domain/repositories/employees-repository.interface.js"
 import type { Query } from "../domain/shared/query.js"
-import { WorkSchedule, WorkScheduleItem } from "../domain/shared/work-schedule.model.js"
 import { getMany, getOne, remove, save, update } from "./context-infra.js"
-import mapAnyToDepartment from "./mappers/department.mapper.js"
-import mapAnyToRole from "./mappers/role.mapper.js"
+import mapAnyToEmployee from "./mappers/employee.mapper.js"
 import BaseRepository from "./shared/base-repository.js"
 
 export default class EmployeeRepository extends BaseRepository<Employee> implements IEmployeeRepository {
@@ -79,30 +77,7 @@ export default class EmployeeRepository extends BaseRepository<Employee> impleme
     }
     
     protected mapToEntity(data: any): Employee {
-        const firstPeriod = new WorkScheduleItem(data.firstPeriodStart, data.firstPeriodEnd)
-        
-        let lunch: WorkScheduleItem | undefined = undefined
-        if (data.lunchPeriodStart && data.lunchPeriodEnd)
-            lunch = new WorkScheduleItem(data.lunchPeriodStart, data.lunchPeriodEnd)
-
-        let secondPeriod: WorkScheduleItem | undefined = undefined
-        if (data.secondPeriodStart && data.secondPeriodEnd)
-            secondPeriod = new WorkScheduleItem(data.secondPeriodStart, data.secondPeriodEnd)
-
-        const workSchedule = new WorkSchedule(firstPeriod, lunch, secondPeriod)
-
-        const department = mapAnyToDepartment(data.department)
-        const role = mapAnyToRole(data.role)
-
-        return new Employee(
-            data.name,
-            workSchedule,
-            department,
-            role,
-            data.id,
-            data.createdAt,
-            data.updatedAt
-        )
+        return mapAnyToEmployee(data)
     }
 
     private buildSaveOrUpdateData(employee: Employee): any {
