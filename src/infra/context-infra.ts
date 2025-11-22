@@ -77,7 +77,12 @@ async function save<T extends EntitiesType>(entityType: T, data: any): Promise<a
                     groupMembers: {
                         include: {
                             role: true,
-                            department: true,
+                            employee: { 
+                                include: {
+                                    department: true,
+                                    role: true
+                                }
+                            },
                             group: true
                         }
                     }
@@ -128,7 +133,12 @@ async function update<T extends EntitiesType>(entityType: T, id: number, data: a
                     groupMembers: {
                         include: {
                             role: true,
-                            department: true,
+                            employee: { 
+                                include: {
+                                    department: true,
+                                    role: true
+                                }
+                            },
                             group: true
                         }
                     }
@@ -201,7 +211,12 @@ async function getOne<T extends EntitiesType>(entityType: T, where: any): Promis
                     groupMembers: {
                         include: {
                             role: true,
-                            department: true,
+                            employee: { 
+                                include: {
+                                    department: true,
+                                    role: true
+                                }
+                            },
                             group: true
                         }
                     }
@@ -234,7 +249,12 @@ async function getMany<T extends EntitiesType>(entityType: T, query: Query): Pro
                 groupMembers: {
                     include: {
                         role: true,
-                        department: true,
+                        employee: { 
+                            include: {
+                                department: true,
+                                role: true
+                            }
+                        },
                         group: true
                     }
                 }

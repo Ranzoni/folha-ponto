@@ -5,18 +5,18 @@ import mapAnyToEmployee from "./employee.mapper.js"
 import mapAnyToRole from "./role.mapper.js"
 
 export default function mapAnyToGroup(data: any): Group {
-    const members = data.members.map((member: any) => {
+    const members = data.groupMembers.map((member: any) => {
         let employee: Employee | undefined
-        if (data.employee)
-            employee = mapAnyToEmployee(data.employee)
+        if (member.employee)
+            employee = mapAnyToEmployee(member.employee)
 
         let role: Role | undefined
-        if (data.role)
-            role = mapAnyToRole(data.role)
+        if (member.role)
+            role = mapAnyToRole(member.role)
 
         return {
             id: member.id,
-            employee: member.employee,
+            employee,
             role
         } as IGroupMember
     })

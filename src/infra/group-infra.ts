@@ -9,15 +9,28 @@ export default class GroupRepository extends BaseRepository<Group> implements IG
     async save(entity: Group): Promise<Group | undefined> {
         return await this.executeSaveOrUpdate(entity, async (group) => {
             const membersData = group.members.map(memberData => {
-                return {
-                    employee: memberData.employee,
-                    role: memberData.role,
+                const member: any = {}
+                
+                if (memberData.employee?.id) {
+                    member.employee = {
+                        connect: { id: memberData.employee.id }
+                    }
                 }
+                
+                if (memberData.role?.id) {
+                    member.role = {
+                        connect: { id: memberData.role.id }
+                    }
+                }
+                
+                return member
             })
 
             const data = {
                 name: group.name,
-                groupMembers: membersData,
+                groupMembers: {
+                    create: membersData,
+                },
                 createdAt: group.createdAt
             }
 
@@ -31,14 +44,24 @@ export default class GroupRepository extends BaseRepository<Group> implements IG
 
     async update(entity: Group): Promise<Group | undefined> {
         return await this.executeSaveOrUpdate(entity, async (group) => {
-            const membersData = group.members.map(memberData => {
-                if (memberData.id)
-                    return
+            const membersData = group.members
+            .filter(memberData => !memberData.id)
+            .map(memberData => {
+                const member: any = {}
                 
-                return {
-                    employee: memberData.employee,
-                    role: memberData.role,
+                if (memberData.employee?.id) {
+                    member.employee = {
+                        connect: { id: memberData.employee.id }
+                    }
                 }
+                
+                if (memberData.role?.id) {
+                    member.role = {
+                        connect: { id: memberData.role.id }
+                    }
+                }
+                
+                return member
             })
 
             const data = {
