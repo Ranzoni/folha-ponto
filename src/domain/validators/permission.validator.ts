@@ -5,7 +5,22 @@ function hasPermission(permissions: PermissionItem[]): boolean {
 }
 
 function hasEntityInformed(permission: Permission): boolean {
-    return !!permission.role || !!permission.department || !!permission.group
+    return !!permission.employee || !!permission.role || !!permission.department || !!permission.group
 }
 
-export { hasPermission, hasEntityInformed }
+function onlyOneEntityInformed(permission: Permission): boolean {
+    if (permission.employee)
+        if (permission.role || permission.department || permission.group)
+            return false
+
+    if (permission.role)
+        if (permission.department || permission.group)
+            return false
+
+    if (permission.department && permission.group)
+            return false
+
+    return true
+}
+
+export { hasPermission, hasEntityInformed, onlyOneEntityInformed }

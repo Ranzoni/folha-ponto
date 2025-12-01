@@ -87,17 +87,15 @@ class Group extends BaseModel {
         if (employeesIds.length === 0)
             return false
 
-        let hasUpdate = false
         const membersIds = this._members.filter(member => {
             if (!member.employee)
                 return
 
-            hasUpdate = true
             return employeesIds.findIndex(id => id === member.employee!.id)
         }) ?? []
 
         removeArrayItems(this._members, membersIds.map(m => m.id))
-        return hasUpdate
+        return membersIds.length > 0
     }
 
     private addRoles(roles: Role[]): boolean {
@@ -121,17 +119,15 @@ class Group extends BaseModel {
         if (rolesIds.length === 0)
             return false
 
-        let hasUpdate = false
         const membersIds = this._members.filter(member => {
             if (!member.role)
                 return
 
-            hasUpdate = true
             return rolesIds.findIndex(id => id === member.role!.id)
         }) ?? []
 
         removeArrayItems(this._members, membersIds.map(m => m.id))
-        return hasUpdate
+        return membersIds.length > 0
     }
 
     protected validate(): void {

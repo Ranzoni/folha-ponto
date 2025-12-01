@@ -6,4 +6,8 @@ export default class PermissionError extends Error {
     static entityNotInformed(): void {
         throw new PermissionError('É necessário informar ao menos um funcionário, um departamento ou um grupo de funcionários para as permissões.')
     }
+
+    static manyEntitiesInformed(): void {
+        throw new PermissionError('Há mais de uma entidade informada para a permissão.')
+    }
 }

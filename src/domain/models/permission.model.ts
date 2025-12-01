@@ -4,18 +4,21 @@ import PermissionError from "../errors/permission.error.js"
 import { BaseModel } from "./base.model.js"
 import Department from "./department.model.js"
 import { removeArrayItems } from "../shared/utils-functions.js"
-import { hasEntityInformed, hasPermission } from "../validators/permission.validator.js"
+import { hasEntityInformed, hasPermission, onlyOneEntityInformed } from "../validators/permission.validator.js"
 import type Role from "./role.model.js"
 import { Group } from "./group.model.js"
+import type Employee from "./employee.model.js"
 
 class Permission extends BaseModel {
     private _permissions: PermissionItem[] = []
+    private _employee?: Employee
     private _role?: Role
     private _department?: Department
     private _group?: Group
 
     constructor(
         permissions: PermissionItem[],
+        employee?: Employee,
         role?: Role,
         department?: Department,
         group?: Group,
@@ -27,6 +30,9 @@ class Permission extends BaseModel {
         
         this._permissions = permissions
 
+        if (employee)
+            this._employee = employee
+
         if (role)
             this._role
 
@@ -37,6 +43,10 @@ class Permission extends BaseModel {
             this._group = group
 
         this.validate()
+    }
+
+    get employee(): Employee | undefined {
+        return this._employee
     }
 
     get role(): Role | undefined {
@@ -55,20 +65,12 @@ class Permission extends BaseModel {
         return this._permissions
     }
 
-    addPermissions(permissions: PermissionItem[]): void {
-        if (permissions.length === 0)
-            return
-        
-        permissions.every(permission => this._permissions.push(permission))
-        this.registerUpdate()
-    }
+    updatePermissions(permissions: PermissionItem[]): void {
+        const permissionsRemoved = this.removePermissions(permissions.map(p => p.id))
+        const permissionsIncluded = this.addPermissions(permissions)
 
-    removePermissions(permissionsIds: number[]): void {
-        if (permissionsIds.length === 0)
-            return
-        
-        removeArrayItems(this._permissions, permissionsIds)
-        this.registerUpdate()
+        if (permissionsRemoved || permissionsIncluded)
+            this.registerUpdate()
     }
 
     protected validate(): void {
@@ -77,6 +79,35 @@ class Permission extends BaseModel {
 
         if (!hasEntityInformed(this))
             PermissionError.entityNotInformed()
+
+        if (!onlyOneEntityInformed(this))
+            PermissionError.manyEntitiesInformed()
+    }
+
+    private addPermissions(permissions: PermissionItem[]): boolean {
+        if (permissions.length === 0)
+            return false
+
+        let hasUpdate = false
+        permissions.forEach(permission => {
+            if (this._permissions.find(p => p.id === permission.id))
+                return
+
+            this._permissions.push(permission)
+            hasUpdate = true
+        })
+
+        return hasUpdate
+    }
+    
+    private removePermissions(permissionsIds: number[]): boolean {
+        if (permissionsIds.length === 0)
+            return false
+
+        const ids = this._permissions.filter(permission => permissionsIds.findIndex(id => id === permission.id)) ?? []
+
+        removeArrayItems(this._permissions, ids.map(m => m.id))
+        return ids.length > 0
     }
 }
 
