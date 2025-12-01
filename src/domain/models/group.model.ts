@@ -42,12 +42,36 @@ class Group extends BaseModel {
         this.registerUpdate()
     }
 
-    addEmployees(employees: Employee[]): void {
+    updateEmployees(employees: Employee[]): void {
+        const employeesToRemove = this._members.filter(member => {
+            return member.employee && !employees.find(employee => employee.id == member.employee!.id)
+        })
+
+        const employeesRemoved = this.removeEmployees(employeesToRemove.map(employee => employee.id))
+        const employeesIncluded = this.addEmployees(employees)
+
+        if (employeesRemoved || employeesIncluded)
+            this.registerUpdate()
+    }
+
+    updateRoles(roles: Role[]): void {
+        const rolesToRemove = this._members.filter(member => {
+            return member.role && !roles.find(role => role.id == member.role!.id)
+        })
+
+        const rolesRemoved = this.removeRoles(rolesToRemove.map(role => role.id))
+        const rolesIncluded = this.addRoles(roles)
+
+        if (rolesRemoved || rolesIncluded)
+            this.registerUpdate()
+    }
+
+    private addEmployees(employees: Employee[]): boolean {
         if (employees.length === 0)
-            return
+            return false
 
         let hasUpdate = false
-        employees.every(employee => {
+        employees.forEach(employee => {
             if (this._members.find(m => m.employee && m.employee.id === employee.id))
                 return
 
@@ -56,31 +80,32 @@ class Group extends BaseModel {
             hasUpdate = true
         })
 
-        if (hasUpdate)
-            this.registerUpdate()
+        return hasUpdate
     }
 
-    removeEmployees(employeesIds: number[]): void {
+    private removeEmployees(employeesIds: number[]): boolean {
         if (employeesIds.length === 0)
-            return
+            return false
 
+        let hasUpdate = false
         const membersIds = this._members.filter(member => {
             if (!member.employee)
                 return
 
-            employeesIds.findIndex(id => id === member.employee!.id)
+            hasUpdate = true
+            return employeesIds.findIndex(id => id === member.employee!.id)
         }) ?? []
 
         removeArrayItems(this._members, membersIds.map(m => m.id))
-        this.registerUpdate()
+        return hasUpdate
     }
 
-    addRoles(roles: Role[]): void {
+    private addRoles(roles: Role[]): boolean {
         if (roles.length === 0)
-            return
+            return false
 
         let hasUpdate = false
-        roles.every(role => {
+        roles.forEach(role => {
             if (this._members.find(m => m.role && m.role.id === role.id))
                 return
 
@@ -89,23 +114,24 @@ class Group extends BaseModel {
             hasUpdate = true
         })
 
-        if (hasUpdate)
-            this.registerUpdate()
+        return hasUpdate
     }
 
-    removeRoles(rolesIds: number[]): void {
+    private removeRoles(rolesIds: number[]): boolean {
         if (rolesIds.length === 0)
-            return
+            return false
 
+        let hasUpdate = false
         const membersIds = this._members.filter(member => {
             if (!member.role)
                 return
 
-            rolesIds.findIndex(id => id === member.role!.id)
+            hasUpdate = true
+            return rolesIds.findIndex(id => id === member.role!.id)
         }) ?? []
 
         removeArrayItems(this._members, membersIds.map(m => m.id))
-        this.registerUpdate()
+        return hasUpdate
     }
 
     protected validate(): void {

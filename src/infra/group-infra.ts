@@ -1,7 +1,7 @@
 import type { Group } from "../domain/models/group.model.js"
 import type IGroupRepository from "../domain/repositories/group-repository.interface.js"
 import type { Query } from "../domain/shared/query.js"
-import { getMany, getOne, remove, save } from "./context-infra.js"
+import { getMany, getOne, remove, save, update } from "./context-infra.js"
 import mapAnyToGroup from "./mappers/group.mapper.js"
 import BaseRepository from "./shared/base-repository.js"
 
@@ -45,36 +45,43 @@ export default class GroupRepository extends BaseRepository<Group> implements IG
     async update(entity: Group): Promise<Group | undefined> {
         return await this.executeSaveOrUpdate(entity, async (group) => {
             const membersData = group.members
-            .filter(memberData => !memberData.id)
-            .map(memberData => {
-                const member: any = {}
-                
-                if (memberData.employee?.id) {
-                    member.employee = {
-                        connect: { id: memberData.employee.id }
+                .filter(memberData => !memberData.id)
+                .map(memberData => {
+                    const member: any = {}
+                    
+                    if (memberData.employee?.id) {
+                        member.employee = {
+                            connect: { id: memberData.employee.id }
+                        }
                     }
-                }
-                
-                if (memberData.role?.id) {
-                    member.role = {
-                        connect: { id: memberData.role.id }
+                    
+                    if (memberData.role?.id) {
+                        member.role = {
+                            connect: { id: memberData.role.id }
+                        }
                     }
-                }
-                
-                return member
-            })
+                    
+                    return member
+                })
 
             const data = {
                 name: group.name,
-                membersData,
+                groupMembers: {
+                    deleteMany: {
+                        id: {
+                            notIn: group.members.map(m => m.id)
+                        }
+                    },
+                    create: membersData,
+                },
                 updatedAt: group.updatedAt
             }
 
-            const groupCreated = await save('group', data)
-            if (!groupCreated)
+            const groupUpdated = await update('group', group.id, data)
+            if (!groupUpdated)
                 return undefined
 
-            return this.mapToEntity(groupCreated)
+            return this.mapToEntity(groupUpdated)
         })
     }
 

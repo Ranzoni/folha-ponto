@@ -49,7 +49,7 @@ export default class GroupService {
         const roles = await this.getRoles(request.rolesIds)
         this.validateRolesInformed(request.rolesIds, roles)
 
-        await this.validateGroupRegister(request.name)
+        await this.validateGroupRegister(request.name, id)
 
         const group = await this._groupRepository.get(id)
         if (!group)
@@ -58,12 +58,12 @@ export default class GroupService {
         if (request.name != group!.name)
             group!.update(request.name)
 
-        this.updateEmployeesMembers(group!, employees)
-        this.updateRolesMembers(group!, roles)
+        group!.updateEmployees(employees)
+        group!.updateRoles(roles)
 
         const groupUpdated = await this._groupRepository.update(group!)
         if (!groupUpdated)
-            throw new GroupError('Falha ao recuperar o grupo criado.')
+            throw new GroupError('Falha ao recuperar o grupo alterado.')
 
         return mapToGroupResponse(groupUpdated)
     }
@@ -89,23 +89,7 @@ export default class GroupService {
     async searchGroups(filter: FilterRequest): Promise<GroupResponse[]> {
         const query = mapToQuery(filter)
         const groups = await this._groupRepository.getMany(query.query)
-        return groups.map(group => mapToGroupResponse(group))
-    }
-
-    private updateEmployeesMembers(group: Group, employees: Employee[]): void {
-        if (employees.length === 0)
-            return
-
-        group.removeEmployees(employees.map(employee => employee.id))
-        group.addEmployees(employees)
-    }
-
-    private updateRolesMembers(group: Group, roles: Role[]): void {
-        if (roles.length === 0)
-            return
-
-        group.removeRoles(roles.map(role => role.id))
-        group.addRoles(roles)
+        return groups.map(group => mapToGroupResponse(group, true))
     }
 
     private buildFilterIdsQuery(ids: number[]): Query {
@@ -114,11 +98,17 @@ export default class GroupService {
         return query
     }
 
-    private async getEmployees(employeesIds: number[]): Promise<Employee[]> {
+    private async getEmployees(employeesIds?: number[]): Promise<Employee[]> {
+        if (!employeesIds)
+            return []
+
         return await this._employeeRepository.getMany(this.buildFilterIdsQuery(employeesIds))
     }
 
-    private async getRoles(rolesIds: number[]): Promise<Role[]> {
+    private async getRoles(rolesIds?: number[]): Promise<Role[]> {
+        if (!rolesIds)
+            return []
+
         return await this._roleRepository.getMany(this.buildFilterIdsQuery(rolesIds))
     }
 
