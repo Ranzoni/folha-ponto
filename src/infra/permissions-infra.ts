@@ -1,4 +1,5 @@
 import type Department from "../domain/models/department.model.js"
+import type Employee from "../domain/models/employee.model.js"
 import type { Group } from "../domain/models/group.model.js"
 import { Permission, type PermissionItem } from "../domain/models/permission.model.js"
 import type Role from "../domain/models/role.model.js"
@@ -6,15 +7,33 @@ import type IPermissionRepository from "../domain/repositories/permissions-repos
 import type { Query } from "../domain/shared/query.js"
 import { save, update, remove, getOne, getMany } from "./context-infra.js"
 import mapAnyToDepartment from "./mappers/department.mapper.js"
+import mapAnyToEmployee from "./mappers/employee.mapper.js"
 import mapAnyToGroup from "./mappers/group.mapper.js"
 import mapAnyToRole from "./mappers/role.mapper.js"
 import BaseRepository from "./shared/base-repository.js"
 
 export default class PermissionRepository extends BaseRepository<Permission> implements IPermissionRepository {
+    getByEmployeeId(employeeId: number): Promise<Permission | undefined> {
+        throw new Error("Method not implemented.")
+    }
+    
+    getByRoleId(roleId: number): Promise<Permission | undefined> {
+        throw new Error("Method not implemented.")
+    }
+
+    getByDepartmentId(departmentId: number): Promise<Permission | undefined> {
+        throw new Error("Method not implemented.")
+    }
+    
+    getByGroupId(groupId: number): Promise<Permission | undefined> {
+        throw new Error("Method not implemented.")
+    }
+
     async save(entity: Permission): Promise<Permission | undefined> {
         return await this.executeSaveOrUpdate(entity, async (permission) => {
             const permissionCreated = await save('permission', {
                 permissions: permission.permissions,
+                employee: permission.employee,
                 role: permission.role,
                 department: permission.department,
                 employeeGroup: permission.group,
@@ -31,6 +50,7 @@ export default class PermissionRepository extends BaseRepository<Permission> imp
         return await this.executeSaveOrUpdate(entity, async (permission) => {
             const data: any = {
                 permissions: permission.permissions,
+                employee: permission.employee,
                 role: permission.role,
                 department: permission.department,
                 employeeGroup: permission.group,
@@ -39,35 +59,35 @@ export default class PermissionRepository extends BaseRepository<Permission> imp
             if (permission.updatedAt)
                 data['updatedAt'] = permission.updatedAt
 
-            const departmentAltered = await update('department', entity.id, data)
-            if (!departmentAltered)
+            const permissionAltered = await update('permission', entity.id, data)
+            if (!permissionAltered)
                 return undefined
 
-            return this.mapToEntity(departmentAltered)
+            return this.mapToEntity(permissionAltered)
         })
     }
 
     async delete(entity: Permission): Promise<boolean> {
         return await this.executeDelete(entity, async (id) => {
-            const departmentDeleted = await remove('department', id)
-            return !!departmentDeleted
+            const permissionDeleted = await remove('permission', id)
+            return !!permissionDeleted
         })
     }
 
     async get(id: number): Promise<Permission | undefined> {
-        const department = await getOne('department', {
+        const permission = await getOne('permission', {
             id
         })
         
-        if (!department)
+        if (!permission)
             return undefined
 
-        return this.mapToEntity(department)
+        return this.mapToEntity(permission)
     }
 
     async getMany(query: Query): Promise<Permission[]> {
-        const departments = await getMany('department', query)
-        return departments.map(department => this.mapToEntity(department))
+        const permissions = await getMany('permission', query)
+        return permissions.map(permission => this.mapToEntity(permission))
     }
 
     protected mapToEntity(data: any): Permission {
@@ -78,6 +98,10 @@ export default class PermissionRepository extends BaseRepository<Permission> imp
                 type: permission.type
             } as PermissionItem
         })
+
+        let employee: Employee | undefined
+        if (data.employee)
+            employee = mapAnyToEmployee(data.employee)
 
         let role: Role | undefined
         if (data.role)
@@ -93,6 +117,7 @@ export default class PermissionRepository extends BaseRepository<Permission> imp
 
         return new Permission(
             permissions,
+            employee,
             role,
             department,
             group,

@@ -144,6 +144,20 @@ async function update<T extends EntitiesType>(entityType: T, id: number, data: a
                     }
                 }
             })
+        case 'permission':
+            await transaction!.permission.update({
+                where: {
+                    id
+                },
+                data,
+                include: {
+                    employee: true,
+                    department: true,
+                    role: true,
+                    group : true,
+                    permissions: true
+                }
+            })
         default:
             ContextError.operationNotAllowed()
     }
@@ -174,6 +188,12 @@ async function remove<T extends EntitiesType>(entityType: T, id: number): Promis
             })
         case 'group':
             return await transaction!.group.delete({
+                where: {
+                    id
+                }
+            })
+        case 'permission':
+            return await transaction!.permission.delete({
                 where: {
                     id
                 }
@@ -222,6 +242,17 @@ async function getOne<T extends EntitiesType>(entityType: T, where: any): Promis
                     }
                 }
             })
+        case 'permission':
+            return await transaction!.permission.findFirst({
+                where,
+                include: {
+                    employee: true,
+                    department: true,
+                    role: true,
+                    group : true,
+                    permissions: true
+                }
+            })
         default:
             ContextError.operationNotAllowed()
     }
@@ -260,6 +291,15 @@ async function getMany<T extends EntitiesType>(entityType: T, query: Query): Pro
                 }
             }
             return await transaction!.group.findMany(prismaQuery)
+        case 'permission':
+            prismaQuery['include'] = { 
+                employee: true,
+                department: true,
+                role: true,
+                group : true,
+                permissions: true
+            }
+            return await transaction!.permission.findMany(prismaQuery)
         default:
             ContextError.operationNotAllowed()
     }
