@@ -1,4 +1,4 @@
-import type { GroupResponse } from "../../api/models/group.response.js"
+import type { GroupResponse } from "../../api/models/groups/group.response.js"
 import type { Group } from "../../domain/models/group.model.js"
 import mapToEmployeeResponse from "./employee.mapper.js"
 import mapToRoleResponse from "./role.mapper.js"

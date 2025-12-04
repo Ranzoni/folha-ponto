@@ -1,5 +1,7 @@
-import type { EmployeeRequest, EmployeeResponse, WorkScheduleRequestOrResponse } from "../api/models/employee.response.js"
+import type { EmployeeRequest } from "../api/models/employees/employee.request.js"
+import type { EmployeeResponse } from "../api/models/employees/employee.response.js"
 import type { FilterRequest } from "../api/models/filter.request.js"
+import type { IWorkSchedule } from "../api/models/work-schedule.interface.js"
 import DepartmentError from "../domain/errors/department.error.js"
 import EmployeeError from "../domain/errors/employee.error.js"
 import RoleError from "../domain/errors/role.error.js"
@@ -115,7 +117,7 @@ export default class EmployeeService {
             RoleError.notFound()
     }
     
-    private updateWorkSchedule(workScheduleRequest: WorkScheduleRequestOrResponse, employee: Employee): void {
+    private updateWorkSchedule(workScheduleRequest: IWorkSchedule, employee: Employee): void {
         const workSchedule = mapToWorkSchedule(workScheduleRequest)
 
         if (!employee.workSchedule.firstPeriod.isEqual(workSchedule.firstPeriod))

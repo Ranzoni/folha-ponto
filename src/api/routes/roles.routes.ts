@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from "express"
 import { handleFailResponse, handleSuccessResponse, handleThrowResponse } from "../models/api.response.js"
 import mapToFilterRequest from "../mappers/filter-request.mapper.js"
 import { getService, transaction } from "../api-injector.js"
-import type { RoleResponse } from "../models/role.response.js"
+import type { RoleResponse } from "../models/roles/role.response.js"
 import type RoleService from "../../services/role-service.js"
 
 const roleRoutes = Router()

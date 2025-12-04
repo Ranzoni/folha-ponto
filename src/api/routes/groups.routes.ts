@@ -1,7 +1,8 @@
 import { Router, type Request, type Response } from "express"
 import { handleFailResponse, handleSuccessResponse, handleThrowResponse, type ApiResponse } from "../models/api.response.js"
 import { getService, transaction } from "../api-injector.js"
-import type { GroupRequest, GroupResponse } from "../models/group.response.js"
+import type { GroupRequest } from "../models/groups/group.request.js"
+import type { GroupResponse } from "../models/groups/group.response.js"
 import type GroupService from "../../services/group-service.js"
 import mapToFilterRequest from "../mappers/filter-request.mapper.js"
 

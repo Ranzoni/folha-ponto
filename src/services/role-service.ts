@@ -4,7 +4,7 @@ import { mapToQuery } from "./mappers/query.mapper.js"
 import mapToRoleResponse from "./mappers/role.mapper.js"
 import type { FilterRequest } from "../api/models/filter.request.js"
 import type IRoleRepository from "../domain/repositories/roles-repository.interface.js"
-import type { RoleResponse } from "../api/models/role.response.js"
+import type { RoleResponse } from "../api/models/roles/role.response.js"
 
 export default class RoleService {
     private _roleRepository: IRoleRepository

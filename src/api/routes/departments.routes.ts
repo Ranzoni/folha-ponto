@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express"
 import { handleFailResponse, handleSuccessResponse, handleThrowResponse } from "../models/api.response.js"
-import type DepartmentResponse from "../models/department.response.js"
+import type DepartmentResponse from "../models/departments/department.response.js"
 import { getService, transaction } from "../api-injector.js"
 import type DepartmentService from "../../services/department-service.js"
 import mapToFilterRequest from "../mappers/filter-request.mapper.js"

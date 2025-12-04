@@ -1,5 +1,6 @@
 import type { FilterRequest } from "../api/models/filter.request.js"
-import type { GroupRequest, GroupResponse } from "../api/models/group.response.js"
+import type { GroupRequest } from "../api/models/groups/group.request.js"
+import type { GroupResponse } from "../api/models/groups/group.response.js"
 import { ConditionOperator } from "../domain/enums/condition-operator.enum.js"
 import EmployeeError from "../domain/errors/employee.error.js"
 import GroupError from "../domain/errors/group.error.js"

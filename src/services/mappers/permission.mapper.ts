@@ -1,4 +1,4 @@
-import type { PermissionResponse } from "../../api/models/permission.request.js"
+import type { PermissionResponse } from "../../api/models/permissions/permission.response.js"
 import type { Permission } from "../../domain/models/permission.model.js"
 import mapToDepartmentResponse from "./department.mapper.js"
 import mapToEmployeeResponse from "./employee.mapper.js"

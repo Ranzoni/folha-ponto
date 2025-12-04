@@ -1,4 +1,4 @@
-import type { EmployeeResponse } from "../../api/models/employee.response.js"
+import type { EmployeeResponse } from "../../api/models/employees/employee.response.js"
 import type Employee from "../../domain/models/employee.model.js"
 import mapToDepartmentResponse from "./department.mapper.js"
 import mapToRoleResponse from "./role.mapper.js"

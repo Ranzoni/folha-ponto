@@ -1,8 +1,8 @@
-import type { WorkScheduleRequestOrResponse } from "../../api/models/employee.response.js"
+import type { IWorkSchedule as IWorkScheduleApi } from "../../api/models/work-schedule.interface.js"
 import type { IWorkSchedule } from "../../domain/shared/interfaces/work-schedule.interface.js"
 import { WorkSchedule, WorkScheduleItem } from "../../domain/shared/work-schedule.model.js"
 
-function mapToWorkSchedule(workSchedule: WorkScheduleRequestOrResponse): WorkSchedule {
+function mapToWorkSchedule(workSchedule: IWorkScheduleApi): WorkSchedule {
     const firstPeriod = new WorkScheduleItem(
         workSchedule.firstPeriodStart,
         workSchedule.firstPeriodEnd
@@ -25,7 +25,7 @@ function mapToWorkSchedule(workSchedule: WorkScheduleRequestOrResponse): WorkSch
     return new WorkSchedule(firstPeriod, lunch, secondPeriod)
 }
 
-function mapToWorkScheduleResponse(workSchedule: IWorkSchedule): WorkScheduleRequestOrResponse {
+function mapToWorkScheduleResponse(workSchedule: IWorkSchedule): IWorkScheduleApi {
     return {
         firstPeriodStart: workSchedule.firstPeriod.start,
         firstPeriodEnd: workSchedule.firstPeriod.end,
@@ -33,7 +33,7 @@ function mapToWorkScheduleResponse(workSchedule: IWorkSchedule): WorkScheduleReq
         lunchPeriodEnd: workSchedule.lunch?.end,
         secondPeriodStart: workSchedule.secondPeriod?.start,
         secondPeriodEnd: workSchedule.secondPeriod?.end
-    } as WorkScheduleRequestOrResponse
+    } as IWorkScheduleApi
 }
 
 export { mapToWorkSchedule, mapToWorkScheduleResponse }

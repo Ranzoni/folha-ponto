@@ -1,4 +1,4 @@
-import type DepartmentResponse from "../api/models/department.response.js"
+import type DepartmentResponse from "../api/models/departments/department.response.js"
 import type { FilterRequest } from "../api/models/filter.request.js"
 import DepartmentError from "../domain/errors/department.error.js"
 import Department from "../domain/models/department.model.js"

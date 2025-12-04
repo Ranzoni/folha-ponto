@@ -18,4 +18,8 @@ export default class InjectorError extends Error {
     static groupRepoNotFound(): void {
         throw new InjectorError('Group repository not found.')
     }
+
+    static permissionRepoNotFound(): void {
+        throw new InjectorError('Permission repository not found.')
+    }
 }

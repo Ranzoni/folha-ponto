@@ -1,4 +1,5 @@
-import type { PermissionRequest, PermissionResponse } from "../api/models/permission.request.js"
+import type { PermissionRequest } from "../api/models/permissions/permission.request.js"
+import type { PermissionResponse } from "../api/models/permissions/permission.response.js"
 import DepartmentError from "../domain/errors/department.error.js"
 import EmployeeError from "../domain/errors/employee.error.js"
 import GroupError from "../domain/errors/group.error.js"
@@ -38,6 +39,9 @@ export default class PermissionService {
     }
 
     async includePermissions(request: PermissionRequest): Promise<PermissionResponse[]> {
+        if (!request.permissions || request.permissions.length === 0)
+            PermissionError.itemsEmpty()
+
         const permissionItems = request.permissions.map(p => {
             return {
                 id: 0,
