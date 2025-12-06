@@ -1,3 +1,5 @@
+import { isPermissionEntity } from "../enums/permission-entity.enum.js"
+import { isPermissionType } from "../enums/permission-type.enum.js"
 import type { Permission, PermissionItem } from "../models/permission.model.js"
 
 function hasPermission(permissions: PermissionItem[]): boolean {
@@ -5,22 +7,26 @@ function hasPermission(permissions: PermissionItem[]): boolean {
 }
 
 function hasEntityInformed(permission: Permission): boolean {
-    return !!permission.employee || !!permission.role || !!permission.department || !!permission.group
+    return !!permission.employeeId || !!permission.roleId || !!permission.departmentId || !!permission.groupId
 }
 
 function onlyOneEntityInformed(permission: Permission): boolean {
-    if (permission.employee)
-        if (permission.role || permission.department || permission.group)
+    if (permission.employeeId)
+        if (permission.roleId || permission.departmentId || permission.groupId)
             return false
 
-    if (permission.role)
-        if (permission.department || permission.group)
+    if (permission.roleId)
+        if (permission.departmentId || permission.groupId)
             return false
 
-    if (permission.department && permission.group)
+    if (permission.departmentId && permission.groupId)
             return false
 
     return true
 }
 
-export { hasPermission, hasEntityInformed, onlyOneEntityInformed }
+function allItemsAreValid(permission: Permission): boolean {
+    return permission.permissions.every(p => p && isPermissionType(p.type) && isPermissionEntity(p.entity))
+}
+
+export { hasPermission, hasEntityInformed, onlyOneEntityInformed, allItemsAreValid }

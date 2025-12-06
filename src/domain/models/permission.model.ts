@@ -2,26 +2,22 @@ import type { PermissionEntity } from "../enums/permission-entity.enum.js"
 import type { PermissionType } from "../enums/permission-type.enum.js"
 import PermissionError from "../errors/permission.error.js"
 import { BaseModel } from "./base.model.js"
-import Department from "./department.model.js"
 import { removeArrayItems } from "../shared/utils-functions.js"
-import { hasEntityInformed, hasPermission, onlyOneEntityInformed } from "../validators/permission.validator.js"
-import type Role from "./role.model.js"
-import { Group } from "./group.model.js"
-import type Employee from "./employee.model.js"
+import { allItemsAreValid, hasEntityInformed, hasPermission, onlyOneEntityInformed } from "../validators/permission.validator.js"
 
 class Permission extends BaseModel {
     private _permissions: PermissionItem[] = []
-    private _employee?: Employee
-    private _role?: Role
-    private _department?: Department
-    private _group?: Group
+    private _employeeId?: number
+    private _roleId?: number
+    private _departmentId?: number
+    private _groupId?: number
 
     constructor(
         permissions: PermissionItem[],
-        employee?: Employee,
-        role?: Role,
-        department?: Department,
-        group?: Group,
+        employeeId?: number,
+        roleId?: number,
+        departmentId?: number,
+        groupId?: number,
         id?: number,
         createdAt?: Date,
         updatedAt?: Date
@@ -30,35 +26,35 @@ class Permission extends BaseModel {
         
         this._permissions = permissions
 
-        if (employee)
-            this._employee = employee
+        if (employeeId)
+            this._employeeId = employeeId
 
-        if (role)
-            this._role
+        if (roleId)
+            this._roleId = roleId
 
-        if (department)
-            this._department = department
+        if (departmentId)
+            this._departmentId = departmentId
 
-        if (group)
-            this._group = group
+        if (groupId)
+            this._groupId = groupId
 
         this.validate()
     }
 
-    get employee(): Employee | undefined {
-        return this._employee
+    get employeeId(): number | undefined {
+        return this._employeeId
     }
 
-    get role(): Role | undefined {
-        return this._role
+    get roleId(): number | undefined {
+        return this._roleId
     }
 
-    get department(): Department | undefined {
-        return this._department
+    get departmentId(): number | undefined {
+        return this._departmentId
     }
 
-    get group(): Group | undefined {
-        return this._group
+    get groupId(): number | undefined {
+        return this._groupId
     }
 
     get permissions(): PermissionItem[] {
@@ -82,6 +78,9 @@ class Permission extends BaseModel {
 
         if (!onlyOneEntityInformed(this))
             PermissionError.manyEntitiesInformed()
+
+        if (!allItemsAreValid(this))
+            PermissionError.emptyPermissionItem()
     }
 
     private addPermissions(permissions: PermissionItem[]): boolean {

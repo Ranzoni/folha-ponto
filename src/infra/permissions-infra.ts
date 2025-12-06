@@ -1,44 +1,91 @@
-import type Department from "../domain/models/department.model.js"
-import type Employee from "../domain/models/employee.model.js"
-import type { Group } from "../domain/models/group.model.js"
 import { Permission, type PermissionItem } from "../domain/models/permission.model.js"
-import type Role from "../domain/models/role.model.js"
 import type IPermissionRepository from "../domain/repositories/permissions-repository.interface.js"
 import type { Query } from "../domain/shared/query.js"
 import { save, update, remove, getOne, getMany } from "./context-infra.js"
-import mapAnyToDepartment from "./mappers/department.mapper.js"
-import mapAnyToEmployee from "./mappers/employee.mapper.js"
-import mapAnyToGroup from "./mappers/group.mapper.js"
-import mapAnyToRole from "./mappers/role.mapper.js"
 import BaseRepository from "./shared/base-repository.js"
 
 export default class PermissionRepository extends BaseRepository<Permission> implements IPermissionRepository {
-    getByEmployeeId(employeeId: number): Promise<Permission | undefined> {
-        throw new Error("Method not implemented.")
+    async getByEmployeeId(employeeId: number): Promise<Permission | undefined> {
+        const permission = await getOne('permission', {
+            employeeId
+        })
+        
+        if (!permission)
+            return undefined
+
+        return this.mapToEntity(permission)
     }
     
-    getByRoleId(roleId: number): Promise<Permission | undefined> {
-        throw new Error("Method not implemented.")
+    async getByRoleId(roleId: number): Promise<Permission | undefined> {
+        const permission = await getOne('permission', {
+            roleId
+        })
+        
+        if (!permission)
+            return undefined
+
+        return this.mapToEntity(permission)
     }
 
-    getByDepartmentId(departmentId: number): Promise<Permission | undefined> {
-        throw new Error("Method not implemented.")
+    async getByDepartmentId(departmentId: number): Promise<Permission | undefined> {
+        const permission = await getOne('permission', {
+            departmentId
+        })
+        
+        if (!permission)
+            return undefined
+
+        return this.mapToEntity(permission)
     }
     
-    getByGroupId(groupId: number): Promise<Permission | undefined> {
-        throw new Error("Method not implemented.")
+    async getByGroupId(groupId: number): Promise<Permission | undefined> {
+        const permission = await getOne('permission', {
+            groupId
+        })
+        
+        if (!permission)
+            return undefined
+
+        return this.mapToEntity(permission)
     }
 
     async save(entity: Permission): Promise<Permission | undefined> {
         return await this.executeSaveOrUpdate(entity, async (permission) => {
-            const permissionCreated = await save('permission', {
-                permissions: permission.permissions,
-                employee: permission.employee,
-                role: permission.role,
-                department: permission.department,
-                employeeGroup: permission.group,
+            const data: any = {
+                permissions: {
+                    create: permission.permissions.map(p => ({
+                        entity: p.entity,
+                        type: p.type
+                    }))
+                },
                 createdAt: permission.createdAt
-            })
+            }
+
+            if (permission.employeeId) {
+                data.employee = {
+                    connect: { id: permission.employeeId }
+                }
+            }
+
+            if (permission.roleId) {
+                data.role = {
+                    connect: { id: permission.roleId }
+                }
+            }
+
+            if (permission.departmentId) {
+                data.department = {
+                    connect: { id: permission.departmentId }
+                }
+            }
+
+            if (permission.groupId) {
+                data.group = {
+                    connect: { id: permission.groupId }
+                }
+            }
+
+            const permissionCreated = await save('permission', data)
             if (!permissionCreated)
                 return undefined
             
@@ -50,10 +97,10 @@ export default class PermissionRepository extends BaseRepository<Permission> imp
         return await this.executeSaveOrUpdate(entity, async (permission) => {
             const data: any = {
                 permissions: permission.permissions,
-                employee: permission.employee,
-                role: permission.role,
-                department: permission.department,
-                employeeGroup: permission.group,
+                employee: permission.employeeId,
+                role: permission.roleId,
+                department: permission.departmentId,
+                employeeGroup: permission.groupId,
             }
             
             if (permission.updatedAt)
@@ -99,28 +146,28 @@ export default class PermissionRepository extends BaseRepository<Permission> imp
             } as PermissionItem
         })
 
-        let employee: Employee | undefined
-        if (data.employee)
-            employee = mapAnyToEmployee(data.employee)
+        let employeeId: number | undefined
+        if (data.employeeId)
+            employeeId = data.employeeId
 
-        let role: Role | undefined
-        if (data.role)
-            role = mapAnyToRole(data.role)
+        let roleId: number | undefined
+        if (data.roleId)
+            roleId = data.roleId
 
-        let department: Department | undefined
-        if (data.department)
-            department = mapAnyToDepartment(data.department)
+        let departmentId: number | undefined
+        if (data.departmentId)
+            departmentId = data.departmentId
 
-        let group: Group | undefined
-        if (data.group)
-            group =  mapAnyToGroup(data.group)
+        let groupId: number | undefined
+        if (data.groupId)
+            groupId = data.groupId
 
         return new Permission(
             permissions,
-            employee,
-            role,
-            department,
-            group,
+            employeeId,
+            roleId,
+            departmentId,
+            groupId,
             data.id,
             data.createdAt,
             data.updatedAt

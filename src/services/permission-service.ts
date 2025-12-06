@@ -131,7 +131,7 @@ export default class PermissionService {
     }
 
     private async createPermission(items: PermissionItem[], employee?: Employee, role?: Role, department?: Department, group?: Group): Promise<Permission> {
-        const permission = new Permission(items, employee, role, department, group)
+        const permission = new Permission(items, employee?.id, role?.id, department?.id, group?.id)
         const permissionCreated = await this._permissionRepository.save(permission)
         if (!permissionCreated)
             throw new PermissionError('Falha ao recuperar a permissão criada.')

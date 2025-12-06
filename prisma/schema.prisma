@@ -111,26 +111,10 @@ model Permission {
   @@map("permissions")
 }
 
-enum PermissionEntity {
-  EMPLOYEE
-  DEPARTMENT
-  ROLE
-  GROUP
-  PERMISSION
-  LOG_EVENT
-}
-
-enum PermissionType {
-  CREATE
-  READ
-  UPDATE
-  DELETE
-}
-
 model PermissionItem {
   id              Int               @id @default(autoincrement())
-  entity          PermissionEntity  @map("entity")
-  type            PermissionType    @map("type")
+  entity          Int               @db.SmallInt 
+  type            Int               @db.SmallInt 
   permissionId    Int               @map("permission_id")
   permission      Permission        @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   createdAt       DateTime          @default(now()) @db.Timestamp(6)  @map("created_at")

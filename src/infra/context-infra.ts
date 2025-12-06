@@ -35,10 +35,6 @@ async function saveMany<T extends EntitiesType>(entityType: T, data: any): Promi
                 data
             })
             break
-        case 'permission':
-            await transaction!.permission.createMany({
-                data
-            })
         default:
             ContextError.operationNotAllowed()
             break
@@ -86,6 +82,26 @@ async function save<T extends EntitiesType>(entityType: T, data: any): Promise<a
                             group: true
                         }
                     }
+                }
+            })
+        case 'permission':
+            return await transaction!.permission.create({
+                data,
+                include: {
+                    employee: { 
+                        include: {
+                            department: true,
+                            role: true
+                        }
+                    },
+                    department: true,
+                    role: true,
+                    group: {
+                        include: {
+                            groupMembers: true
+                        }
+                    },
+                    permissions: true
                 }
             })
         default:
@@ -139,7 +155,11 @@ async function update<T extends EntitiesType>(entityType: T, id: number, data: a
                                     role: true
                                 }
                             },
-                            group: true
+                            group: {
+                                include: {
+                                    groupMembers: true
+                                }
+                            },
                         }
                     }
                 }
@@ -151,7 +171,12 @@ async function update<T extends EntitiesType>(entityType: T, id: number, data: a
                 },
                 data,
                 include: {
-                    employee: true,
+                    employee: { 
+                        include: {
+                            department: true,
+                            role: true
+                        }
+                    },
                     department: true,
                     role: true,
                     group : true,
