@@ -96,15 +96,45 @@ export default class PermissionRepository extends BaseRepository<Permission> imp
     async update(entity: Permission): Promise<Permission | undefined> {
         return await this.executeSaveOrUpdate(entity, async (permission) => {
             const data: any = {
-                permissions: permission.permissions,
-                employee: permission.employeeId,
-                role: permission.roleId,
-                department: permission.departmentId,
-                employeeGroup: permission.groupId,
+                permissions: {
+                    deleteMany: {
+                        id: {
+                            notIn: permission.permissions.filter(p => !!p.id).map(p => p.id)
+                        }
+                    },
+                    create: permission.permissions.filter(p => !p.id).map(p => ({
+                        entity: p.entity,
+                        type: p.type
+                    })),
+                }
+            }
+
+            if (permission.employeeId) {
+                data.employee = {
+                    connect: { id: permission.employeeId }
+                }
+            }
+
+            if (permission.roleId) {
+                data.role = {
+                    connect: { id: permission.roleId }
+                }
+            }
+
+            if (permission.departmentId) {
+                data.department = {
+                    connect: { id: permission.departmentId }
+                }
+            }
+
+            if (permission.groupId) {
+                data.group = {
+                    connect: { id: permission.groupId }
+                }
             }
             
             if (permission.updatedAt)
-                data['updatedAt'] = permission.updatedAt
+                data.updatedAt = permission.updatedAt
 
             const permissionAltered = await update('permission', entity.id, data)
             if (!permissionAltered)

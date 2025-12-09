@@ -1,8 +1,7 @@
-import type BaseResponse from "../base.response.js"
 import type { PermissionEntity } from "../../../domain/enums/permission-entity.enum.js"
 import type { PermissionType } from "../../../domain/enums/permission-type.enum.js"
 
-interface PermissionResponse extends BaseResponse {
+interface PermissionResponse {
     permissions: PermissionItemResponse[]
     employeeId?: number
     roleId?: number
@@ -10,7 +9,7 @@ interface PermissionResponse extends BaseResponse {
     groupId?: number
 }
 
-interface PermissionItemResponse extends BaseResponse {
+interface PermissionItemResponse {
     entity: PermissionEntity
     type: PermissionType
 }

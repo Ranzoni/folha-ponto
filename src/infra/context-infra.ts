@@ -88,19 +88,10 @@ async function save<T extends EntitiesType>(entityType: T, data: any): Promise<a
             return await transaction!.permission.create({
                 data,
                 include: {
-                    employee: { 
-                        include: {
-                            department: true,
-                            role: true
-                        }
-                    },
+                    employee: true,
                     department: true,
                     role: true,
-                    group: {
-                        include: {
-                            groupMembers: true
-                        }
-                    },
+                    group: true,
                     permissions: true
                 }
             })
@@ -165,21 +156,16 @@ async function update<T extends EntitiesType>(entityType: T, id: number, data: a
                 }
             })
         case 'permission':
-            await transaction!.permission.update({
+            return await transaction!.permission.update({
                 where: {
                     id
                 },
                 data,
                 include: {
-                    employee: { 
-                        include: {
-                            department: true,
-                            role: true
-                        }
-                    },
+                    employee: true,
                     department: true,
                     role: true,
-                    group : true,
+                    group: true,
                     permissions: true
                 }
             })

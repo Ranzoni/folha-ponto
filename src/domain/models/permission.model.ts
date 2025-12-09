@@ -62,7 +62,7 @@ class Permission extends BaseModel {
     }
 
     updatePermissions(permissions: PermissionItem[]): void {
-        const permissionsRemoved = this.removePermissions(permissions.map(p => p.id))
+        const permissionsRemoved = this.removePermissions(permissions)
         const permissionsIncluded = this.addPermissions(permissions)
 
         if (permissionsRemoved || permissionsIncluded)
@@ -89,7 +89,7 @@ class Permission extends BaseModel {
 
         let hasUpdate = false
         permissions.forEach(permission => {
-            if (this._permissions.find(p => p.id === permission.id))
+            if (this._permissions.find(p => p.type === permission.type && p.entity === permission.entity))
                 return
 
             this._permissions.push(permission)
@@ -99,11 +99,13 @@ class Permission extends BaseModel {
         return hasUpdate
     }
     
-    private removePermissions(permissionsIds: number[]): boolean {
-        if (permissionsIds.length === 0)
+    private removePermissions(permissions: PermissionItem[]): boolean {
+        if (permissions.length === 0)
             return false
 
-        const ids = this._permissions.filter(permission => permissionsIds.findIndex(id => id === permission.id)) ?? []
+        const ids = this._permissions.filter(permission =>
+            permissions.findIndex(p => p.type === permission.type && p.entity === permission.entity)
+        ) ?? []
 
         removeArrayItems(this._permissions, ids.map(m => m.id))
         return ids.length > 0
